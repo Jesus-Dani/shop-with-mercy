@@ -1,0 +1,346 @@
+/* ============================================================
+   SHOP WITH MERCY — DESIGN SYSTEM
+   All colour, type, spacing, and component tokens live here.
+   Dark mode uses [data-theme="dark"] on <html>.
+   ============================================================ */
+
+/* ── Google Fonts: DM Sans variable font ─────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap');
+
+/* ── Brand colour tokens ─────────────────────────────────── */
+:root {
+  /* Raw palette */
+  --color-cornsilk:     #fefae0;
+  --color-black-forest: #283618;
+  --color-olive-leaf:   #606c38;
+  --color-sunlit-clay:  #dda15e;
+  --color-copperwood:   #bc6c25;
+
+  /* Derived tones */
+  --color-cornsilk-dark:        #f0e9cc; /* card bg in light mode */
+  --color-black-forest-nav:     #283618; /* nav always dark */
+  --color-black-forest-dark-bg: #1a2410; /* dark mode nav depth */
+  --color-black-forest-card:    #354020; /* dark mode card bg */
+  --color-sold-out-bg:          rgba(96, 108, 56, 0.20);
+
+  /* ── Light mode semantic tokens (default) ─────────────── */
+  --bg-page:           var(--color-cornsilk);
+  --bg-card:           var(--color-cornsilk-dark);
+  --bg-nav:            var(--color-black-forest);
+  --text-primary:      var(--color-black-forest);
+  --text-secondary:    var(--color-olive-leaf);
+  --text-nav:          var(--color-cornsilk);
+  --text-wordmark:     var(--color-cornsilk);
+  --text-price-sale:   var(--color-copperwood);
+  --text-price-strike: var(--color-olive-leaf);
+  --btn-primary-bg:    var(--color-black-forest);
+  --btn-primary-text:  var(--color-cornsilk);
+  --btn-primary-hover: var(--color-olive-leaf);
+  --btn-outline-border: var(--color-black-forest);
+  --btn-outline-text:   var(--color-black-forest);
+  --badge-sale-bg:     var(--color-sunlit-clay);
+  --badge-sale-text:   var(--color-black-forest);
+  --badge-sold-out-bg: var(--color-sold-out-bg);
+  --badge-sold-out-text: var(--color-olive-leaf);
+  --input-border:      var(--color-olive-leaf);
+  --input-focus:       var(--color-copperwood);
+  --focus-ring:        var(--color-copperwood);
+  --footer-bg:         var(--color-black-forest);
+  --footer-text:       rgba(254, 250, 224, 0.70);
+  --footer-text-brand: var(--color-cornsilk);
+  --star-filled:       var(--color-sunlit-clay);
+  --star-empty:        rgba(96, 108, 56, 0.40);
+  --border-color:      rgba(96, 108, 56, 0.25);
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-display: 'DM Sans', system-ui, sans-serif; /* wordmark uses SVG/image */
+
+  --text-display: clamp(32px, 5vw, 40px);
+  --text-h1:      24px;
+  --text-h2:      20px;
+  --text-h3:      16px;
+  --text-body:    15px;
+  --text-small:   13px;
+  --text-micro:   11px;
+
+  --leading-tight:  1.3;
+  --leading-normal: 1.6;
+  --measure:        65ch;
+
+  /* ── Spacing (8px base) ─────────────────────────────────── */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+  --space-2xl: 64px;
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  --page-gutter-mobile:  16px;
+  --page-gutter-tablet:  24px;
+  --page-gutter-desktop: 40px;
+  --page-max-width:      1280px;
+  --nav-height:          60px;
+
+  /* ── Radii ──────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  /* ── Transitions ────────────────────────────────────────── */
+  --transition-color:    background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+  --transition-fast:     200ms ease;
+  --transition-medium:   300ms ease;
+  --transition-slow:     350ms ease;
+}
+
+/* ── Dark mode overrides ──────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-page:           var(--color-black-forest);
+  --bg-card:           var(--color-black-forest-card);
+  --bg-nav:            var(--color-black-forest-dark-bg);
+  --text-primary:      var(--color-cornsilk);
+  --text-secondary:    var(--color-sunlit-clay);
+  --text-nav:          var(--color-cornsilk);
+  --text-wordmark:     var(--color-cornsilk);
+  --text-price-sale:   var(--color-copperwood);
+  --text-price-strike: var(--color-sunlit-clay);
+  --btn-primary-bg:    var(--color-cornsilk);
+  --btn-primary-text:  var(--color-black-forest);
+  --btn-primary-hover: #e8ddb8;
+  --btn-outline-border: var(--color-cornsilk);
+  --btn-outline-text:   var(--color-cornsilk);
+  --badge-sale-bg:     var(--color-copperwood);
+  --badge-sale-text:   var(--color-cornsilk);
+  --badge-sold-out-bg: rgba(96, 108, 56, 0.30);
+  --badge-sold-out-text: var(--color-sunlit-clay);
+  --input-border:      var(--color-sunlit-clay);
+  --input-focus:       var(--color-sunlit-clay);
+  --focus-ring:        var(--color-sunlit-clay);
+  --border-color:      rgba(221, 161, 94, 0.25);
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0ms !important;
+    animation-duration:  0ms !important;
+  }
+}
+
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--text-body);
+  font-family: var(--font-body);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  transition: var(--transition-color);
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ── Typography helpers ───────────────────────────────────── */
+h1 { font-size: var(--text-h1); font-weight: 600; line-height: var(--leading-tight); }
+h2 { font-size: var(--text-h2); font-weight: 600; line-height: var(--leading-tight); }
+h3 { font-size: var(--text-h3); font-weight: 600; line-height: var(--leading-tight); }
+
+p { max-width: var(--measure); }
+
+/* ── Layout utilities ─────────────────────────────────────── */
+.page-container {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter-mobile);
+}
+
+@media (min-width: 768px) {
+  .page-container { padding-inline: var(--page-gutter-tablet); }
+}
+
+@media (min-width: 1280px) {
+  .page-container { padding-inline: var(--page-gutter-desktop); }
+}
+
+/* ── Button base styles ───────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-small);
+  font-weight: 500;
+  line-height: 1;
+  min-height: 44px;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: 1.5px solid transparent;
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--btn-outline-text);
+  border: 1.5px solid var(--btn-outline-border);
+}
+
+.btn-outline:hover {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 8px;
+  border-radius: var(--radius-md);
+}
+
+.btn-ghost:hover {
+  color: var(--color-copperwood);
+}
+
+/* ── Form inputs ──────────────────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 12px var(--space-md);
+  font: inherit;
+  font-size: var(--text-body);
+  color: var(--text-primary);
+  background: transparent;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  min-height: 44px;
+}
+
+.input:focus {
+  border-color: var(--input-focus);
+  border-width: 2px;
+}
+
+.input.error {
+  border-color: var(--color-copperwood);
+}
+
+label {
+  display: block;
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+/* ── Badge / chip styles ─────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.badge-sale {
+  background-color: var(--badge-sale-bg);
+  color: var(--badge-sale-text);
+}
+
+.badge-sold-out {
+  background-color: var(--badge-sold-out-bg);
+  color: var(--badge-sold-out-text);
+}
+
+/* ── Skip link (accessibility) ───────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-radius: var(--radius-md);
+  font-size: var(--text-small);
+  font-weight: 600;
+  z-index: 9999;
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: var(--space-md);
+}
+
+/* ── Visually hidden (screen reader only) ────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

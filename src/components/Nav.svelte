@@ -16,8 +16,9 @@
 	}
 
 	const navLinks = [
-		{ href: '/category/tops',   label: 'Tops'   },
-		{ href: '/category/skirts', label: 'Skirts' }
+		{ href: '/shop', label: 'Shop' },
+		{ href: '/shop?category=tops', label: 'Tops' },
+		{ href: '/shop?category=skirts', label: 'Skirts' }
 	];
 </script>
 
@@ -161,7 +162,9 @@
 			{/each}
 			<li class="drawer-divider"></li>
 			<li>
-				<a href="/search" class="drawer-link" onclick={closeDrawer}>Search</a>
+				<a href="/search" class="drawer-link" onclick={closeDrawer}>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:-2px;margin-right:6px"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>Search
+				</a>
 			</li>
 			<li>
 				<a href={user ? '/account' : '/auth/sign-in'} class="drawer-link" onclick={closeDrawer}>

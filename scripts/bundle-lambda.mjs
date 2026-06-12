@@ -5,22 +5,29 @@ import { resolve, dirname } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// adapter-netlify generates the function here (framework internal pipeline)
+// adapter-netlify generates the framework function here
 const SRC = resolve(root, '.netlify/functions-internal/sveltekit-render.mjs');
 
-// We move it here (user functions) so Netlify deploys our pre-bundled file
-// as-is, without its framework post-processing re-bundling it.
+// We move the bundled result to user functions so Netlify deploys it as-is,
+// bypassing the framework function post-processing pipeline.
 const OUT_DIR = resolve(root, 'netlify/functions');
 const OUT = resolve(OUT_DIR, 'sveltekit-render.mjs');
 
+mkdirSync(OUT_DIR, { recursive: true });
+
+// ── ping function (diagnostic — zero deps, tests Lambda v2 works at all) ──
+copyFileSync(resolve(root, 'src/netlify-functions/ping.mjs'), resolve(OUT_DIR, 'ping.mjs'));
+console.log('[bundle-lambda] ping.mjs copied to netlify/functions/');
+
+// ── main SvelteKit function ────────────────────────────────────────────────
 if (!existsSync(SRC)) {
-	console.log('[bundle-lambda] No function found — skipping (not a Netlify build?)');
+	console.log('[bundle-lambda] No sveltekit-render.mjs found — skipping bundle step');
 	process.exit(0);
 }
 
 const TMP = SRC + '.bundle_tmp';
 
-console.log('[bundle-lambda] Bundling Lambda function into self-contained file...');
+console.log('[bundle-lambda] Bundling sveltekit-render.mjs into self-contained file...');
 
 await build({
 	entryPoints: [SRC],
@@ -30,12 +37,8 @@ await build({
 	outfile: TMP
 });
 
-// Replace the source with the bundle, then move it to netlify/functions/.
-// Removing it from .netlify/functions-internal/ prevents Netlify's framework
-// pipeline from re-bundling it (which was producing a broken second pass).
 renameSync(TMP, SRC);
-mkdirSync(OUT_DIR, { recursive: true });
 copyFileSync(SRC, OUT);
 rmSync(SRC);
 
-console.log('[bundle-lambda] Done — self-contained function at netlify/functions/sveltekit-render.mjs');
+console.log('[bundle-lambda] Done — netlify/functions/sveltekit-render.mjs ready');

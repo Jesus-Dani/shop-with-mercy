@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { theme, themeStore } from '$lib/theme';
+	import { cart } from '$lib/cart.svelte';
 
 	interface Props {
-		cartCount?: number;
 		wishlistCount?: number;
 		user?: { full_name: string } | null;
 	}
 
-	let { cartCount = 0, wishlistCount = 0, user = null }: Props = $props();
+	let { wishlistCount = 0, user = null }: Props = $props();
 
 	let drawerOpen = $state(false);
 
@@ -86,17 +86,21 @@
 			</a>
 
 			<!-- Cart -->
-			<a href="/cart" class="nav-icon-btn cart-btn" aria-label={cartCount > 0 ? `Your cart, ${cartCount} items` : 'Your cart'}>
+			<button
+				class="nav-icon-btn cart-btn"
+				aria-label={cart.count > 0 ? `Your cart, ${cart.count} items` : 'Your cart'}
+				onclick={cart.toggle}
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 					<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 					<path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
 					<path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
 					<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2 -1.61l1.6 -8.39h-16.12" />
 				</svg>
-				{#if cartCount > 0}
-					<span class="cart-badge" aria-hidden="true">{cartCount > 9 ? '9+' : cartCount}</span>
+				{#if cart.count > 0}
+					<span class="cart-badge" aria-hidden="true">{cart.count > 9 ? '9+' : cart.count}</span>
 				{/if}
-			</a>
+			</button>
 
 			<!-- Account -->
 			<a href={user ? '/account' : '/auth/sign-in'} class="nav-icon-btn" aria-label={user ? `Account — ${user.full_name}` : 'Sign in'}>

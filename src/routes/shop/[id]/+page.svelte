@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { formatNaira } from '$lib/format';
 	import { cdnUrl, cdnSrcset, HERO_SIZES } from '$lib/cloudinary';
+	import { cart } from '$lib/cart.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -8,7 +9,7 @@
 	let selectedColourIdx = $state(0);
 	let selectedImageIdx = $state(0);
 	let selectedSize = $state<string | null>(null);
-	let cartMessage = $state('');
+	let addedFeedback = $state(false);
 
 	const colour = $derived(data.colours[selectedColourIdx]);
 	const currentImage = $derived(colour?.images[selectedImageIdx] ?? null);
@@ -33,12 +34,19 @@
 	}
 
 	function handleAddToCart() {
-		// Phase 2 will wire this to the real cart.
-		// For now, direct users to WhatsApp.
-		cartMessage = 'Cart coming soon! Contact us on WhatsApp to place your order.';
-		setTimeout(() => {
-			cartMessage = '';
-		}, 4000);
+		if (!canAddToCart || !variant || !colour) return;
+		cart.add({
+			variantId: variant.id,
+			productId: data.product.id,
+			colourId: colour.id,
+			name: data.product.name,
+			colourName: colour.name,
+			size: variant.size,
+			price: data.product.salePrice ?? data.product.price,
+			imagePublicId: colour.images[0]?.cloudinary_public_id ?? null
+		});
+		addedFeedback = true;
+		setTimeout(() => { addedFeedback = false; }, 2000);
 	}
 
 	function starFilled(star: number, rating: number) {
@@ -242,14 +250,12 @@
 						Sold out
 					{:else if !selectedSize}
 						Select a size
+					{:else if addedFeedback}
+						Added ✓
 					{:else}
 						Add to cart
 					{/if}
 				</button>
-
-				{#if cartMessage}
-					<p class="cart-message" role="status">{cartMessage}</p>
-				{/if}
 
 				<!-- Wishlist (Phase 5) -->
 				<button type="button" class="btn btn-outline wishlist-btn" aria-label="Save to wishlist">

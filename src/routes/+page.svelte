@@ -15,7 +15,7 @@
 
 <!-- Hero – editorial split -->
 <section class="hero" aria-label="Shop With Mercy">
-	<div class="hero-panel hero-panel-left">
+	<div class="hero-panel">
 		<img
 			src="/images/skirt.jpeg"
 			alt=""
@@ -26,27 +26,22 @@
 			width="800"
 			height="1000"
 		/>
-		<div class="hero-text">
-			<p class="hero-wordmark">Shop With Mercy</p>
-			<p class="hero-sub">Casual women's clothing for campus life and beyond.</p>
-			<a href="/shop" class="btn btn-primary">Shop the Collection</a>
-		</div>
 	</div>
-
-	<div class="hero-panel hero-panel-right">
+	<div class="hero-panel">
 		<img
 			src="/images/top.jpeg"
 			alt=""
 			aria-hidden="true"
 			class="hero-img"
 			loading="eager"
-			fetchpriority="high"
 			width="800"
 			height="1000"
 		/>
-		<div class="hero-right-cta">
-			<a href="/shop" class="hero-explore-link">Explore All &rarr;</a>
-		</div>
+	</div>
+	<div class="hero-overlay">
+		<p class="hero-wordmark">Shop With Mercy</p>
+		<p class="hero-sub">Casual women's clothing for campus life and beyond.</p>
+		<a href="/shop" class="btn btn-primary">Shop the Collection</a>
 	</div>
 </section>
 
@@ -146,31 +141,40 @@
 <style>
 	/* ── Hero ─────────────────────────────────────────────────── */
 	.hero {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		min-height: 80dvh;
-	}
-
-	@media (min-width: 768px) {
-		.hero {
-			flex-direction: row;
-			height: 88dvh;
-			max-height: 880px;
-		}
+		min-height: 85dvh;
 	}
 
 	.hero-panel {
 		position: relative;
 		overflow: hidden;
 		flex: 1;
-		min-height: 48dvh;
+		min-height: 85dvh;
 		background: var(--color-black-forest);
 	}
 
+	/* Single image on mobile — cleaner focus */
+	.hero-panel:last-of-type {
+		display: none;
+	}
+
 	@media (min-width: 768px) {
+		.hero {
+			flex-direction: row;
+			height: 88dvh;
+			min-height: unset;
+			max-height: 880px;
+		}
+
 		.hero-panel {
 			min-height: unset;
+		}
+
+		.hero-panel:last-of-type {
+			display: block;
 		}
 	}
 
@@ -189,17 +193,24 @@
 		transform: scale(1.05);
 	}
 
-	.hero-text {
+	/* Overlay centered across the full hero width */
+	.hero-overlay {
 		position: absolute;
 		inset: 0;
+		z-index: 2;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		text-align: center;
 		gap: var(--space-lg);
-		padding: var(--space-xl) var(--space-lg);
-		background: rgba(28, 38, 16, 0.42);
+		padding: var(--space-2xl) var(--page-gutter-mobile);
+		background: rgba(28, 38, 16, 0.40);
+		pointer-events: none;
+	}
+
+	.hero-overlay > * {
+		pointer-events: auto;
 	}
 
 	.hero-wordmark {
@@ -220,33 +231,6 @@
 		line-height: var(--leading-normal);
 		max-width: 34ch;
 		margin: 0;
-	}
-
-	.hero-right-cta {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: flex-end;
-		justify-content: flex-end;
-		padding: var(--space-xl);
-		background: rgba(28, 38, 16, 0.12);
-	}
-
-	.hero-explore-link {
-		font-size: var(--text-small);
-		font-weight: 600;
-		color: var(--color-cornsilk);
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		text-decoration: none;
-		border-bottom: 1px solid rgba(254, 250, 224, 0.6);
-		padding-bottom: 3px;
-		transition: color var(--transition-fast), border-color var(--transition-fast);
-	}
-
-	.hero-explore-link:hover {
-		color: var(--color-sunlit-clay);
-		border-color: var(--color-sunlit-clay);
 	}
 
 	/* ── Category nav ─────────────────────────────────────────── */

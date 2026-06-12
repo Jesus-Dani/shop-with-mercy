@@ -3,12 +3,27 @@ import type { Handle } from '@sveltejs/kit';
 
 console.log('[hooks.server] module loaded');
 
+// TEMP: surface errors in the browser response so we can diagnose the Netlify 500
+function errorResponse(label: string, err: unknown): Response {
+	const msg =
+		`[DEBUG ${label}]\n` +
+		String(err) +
+		'\n' +
+		(err instanceof Error ? err.stack ?? '' : '') +
+		'\n\nprocess.env keys: ' +
+		Object.keys(process.env)
+			.filter((k) => k.startsWith('PUBLIC_') || k.startsWith('SUPABASE') || k.startsWith('NODE'))
+			.sort()
+			.join(', ');
+	return new Response(msg, { status: 500, headers: { 'content-type': 'text/plain' } });
+}
+
 export const handle: Handle = async ({ event, resolve }) => {
 	try {
 		event.locals.supabase = createSupabaseServerClient(event.fetch, event.cookies);
 	} catch (err) {
 		console.error('[hooks] createSupabaseServerClient threw:', err);
-		throw err;
+		return errorResponse('createSupabaseServerClient', err);
 	}
 
 	// safeGetSession validates the session JWT before trusting it.
@@ -43,6 +58,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		});
 	} catch (err) {
 		console.error('[hooks] resolve threw:', err);
-		throw err;
+		return errorResponse('resolve', err);
 	}
 };

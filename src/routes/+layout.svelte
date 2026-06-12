@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { theme } from '$lib/theme.svelte';
+	import { theme } from '$lib/theme';
 	import Nav from '$components/Nav.svelte';
 	import Footer from '$components/Footer.svelte';
 	import type { LayoutData } from './$types';

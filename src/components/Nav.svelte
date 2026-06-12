@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { theme } from '$lib/theme.svelte';
+	import { theme, themeStore } from '$lib/theme';
 
 	interface Props {
 		cartCount?: number;
@@ -114,10 +114,10 @@
 			<!-- Theme toggle -->
 			<button
 				class="nav-icon-btn theme-toggle"
-				aria-label={theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+				aria-label={$themeStore === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
 				onclick={theme.toggle}
 			>
-				{#if theme.isDark}
+				{#if $themeStore === 'dark'}
 					<!-- Sun icon -->
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<path stroke="none" d="M0 0h24v24H0z" fill="none"/>

@@ -1,10 +1,12 @@
 import { createSupabaseServerClient } from '$lib/supabase';
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 import type { Handle } from '@sveltejs/kit';
 
-// Module-level log — fires once on Lambda cold start, before any request is handled.
-// If this appears in Netlify function logs but [hooks] lines do not, the crash is inside handle.
-// If this does NOT appear, the crash is during module loading (import chain).
 console.log('[hooks.server] module loaded');
+// These must be set in Netlify → Site settings → Environment variables.
+// If blank, every request throws "URL and Key are required" → 500.
+console.log('[hooks.server] SUPABASE_URL:', PUBLIC_SUPABASE_URL ? 'SET' : 'MISSING — add PUBLIC_SUPABASE_URL to Netlify env vars and redeploy');
+console.log('[hooks.server] SUPABASE_KEY:', PUBLIC_SUPABASE_PUBLISHABLE_KEY ? 'SET' : 'MISSING — add PUBLIC_SUPABASE_PUBLISHABLE_KEY to Netlify env vars and redeploy');
 
 export const handle: Handle = async ({ event, resolve }) => {
 	try {

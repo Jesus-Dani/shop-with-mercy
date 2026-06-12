@@ -2,33 +2,45 @@ import { createSupabaseServerClient } from '$lib/supabase';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.supabase = createSupabaseServerClient(event.fetch, event.cookies);
+	try {
+		event.locals.supabase = createSupabaseServerClient(event.fetch, event.cookies);
+	} catch (err) {
+		console.error('[hooks] createSupabaseServerClient threw:', err);
+		throw err;
+	}
 
-	/**
-	 * safeGetSession validates the session JWT before trusting it.
-	 * Always use this instead of getSession() on the server —
-	 * getSession() alone does not re-validate the JWT against the auth server.
-	 */
+	// safeGetSession validates the session JWT before trusting it.
+	// Returns null (unauthenticated) on any error — never throws.
 	event.locals.safeGetSession = async () => {
-		const {
-			data: { session }
-		} = await event.locals.supabase.auth.getSession();
+		try {
+			const {
+				data: { session }
+			} = await event.locals.supabase.auth.getSession();
 
-		if (!session) return null;
+			if (!session) return null;
 
-		const {
-			data: { user },
-			error
-		} = await event.locals.supabase.auth.getUser();
+			const {
+				data: { user },
+				error
+			} = await event.locals.supabase.auth.getUser();
 
-		if (error || !user) return null;
+			if (error || !user) return null;
 
-		return { ...session, user };
+			return { ...session, user };
+		} catch (err) {
+			console.error('[hooks] safeGetSession threw:', err);
+			return null;
+		}
 	};
 
-	return resolve(event, {
-		filterSerializedResponseHeaders(name) {
-			return name === 'content-range' || name === 'x-supabase-api-version';
-		}
-	});
+	try {
+		return await resolve(event, {
+			filterSerializedResponseHeaders(name) {
+				return name === 'content-range' || name === 'x-supabase-api-version';
+			}
+		});
+	} catch (err) {
+		console.error('[hooks] resolve threw:', err);
+		throw err;
+	}
 };

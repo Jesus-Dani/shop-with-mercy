@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { existsSync, renameSync, mkdirSync, copyFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, renameSync, mkdirSync, copyFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 
@@ -26,43 +26,17 @@ if (!existsSync(SRC)) {
 }
 
 const TMP = SRC + '.bundle_tmp';
-// TEMP: wrapper that surfaces Lambda-level errors in the browser response
-const WRAPPER = SRC + '.wrapper_tmp.mjs';
 
 console.log('[bundle-lambda] Bundling sveltekit-render.mjs into self-contained file...');
 
-writeFileSync(
-	WRAPPER,
-	`
-import _handler from ${JSON.stringify(SRC)};
-export { config } from ${JSON.stringify(SRC)};
-
-export default async function(request, context) {
-  try {
-    return await _handler(request, context);
-  } catch (err) {
-    const body =
-      '[LAMBDA_CRASH]\\n' + String(err) + '\\n' + (err?.stack ?? '') +
-      '\\n\\nprocess.env PUBLIC_* / NODE_* keys: ' +
-      Object.keys(process.env)
-        .filter(k => k.startsWith('PUBLIC_') || k.startsWith('SUPABASE') || k.startsWith('NODE'))
-        .sort()
-        .join(', ');
-    return new Response(body, { status: 500, headers: { 'content-type': 'text/plain' } });
-  }
-}
-`
-);
-
 await build({
-	entryPoints: [WRAPPER],
+	entryPoints: [SRC],
 	bundle: true,
 	platform: 'node',
 	format: 'esm',
 	outfile: TMP
 });
 
-rmSync(WRAPPER);
 renameSync(TMP, SRC);
 copyFileSync(SRC, OUT);
 rmSync(SRC);

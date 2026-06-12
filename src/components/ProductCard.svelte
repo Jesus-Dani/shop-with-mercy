@@ -119,11 +119,11 @@
 		height: 100%;
 		object-fit: cover;
 		display: block;
-		transition: transform var(--transition-slow);
+		transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 	}
 
 	.card:hover .card-img {
-		transform: scale(1.04);
+		transform: scale(1.07);
 	}
 
 	.card-img-placeholder {

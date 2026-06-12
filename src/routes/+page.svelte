@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ProductCard from '$components/ProductCard.svelte';
-	import ProductCardSkeleton from '$components/ProductCardSkeleton.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -14,39 +13,21 @@
 	/>
 </svelte:head>
 
-<!-- Hero: full-width split two-panel -->
+<!-- Hero -->
 <section class="hero" aria-label="Welcome">
-	<div class="hero-left">
-		<div class="hero-content">
-			<p class="hero-eyebrow">New arrivals every week</p>
-			<h1 class="hero-heading">Dress with<br />confidence.</h1>
-			<p class="hero-sub">
-				Casual women's clothing for campus life and beyond. Delivered across Nigeria.
-			</p>
-			<div class="hero-actions">
-				<a href="/shop" class="btn btn-primary">Shop Now</a>
-				<a href="/shop?sale=1" class="btn btn-ghost-light">Sale Items</a>
-			</div>
-		</div>
-	</div>
-	<div class="hero-right" aria-hidden="true">
-		<div class="hero-art">
-			<div class="hero-art-circle hero-art-circle-1"></div>
-			<div class="hero-art-circle hero-art-circle-2"></div>
-			<div class="hero-art-text">SWM</div>
-		</div>
+	<div class="hero-inner">
+		<p class="hero-wordmark">Shop With Mercy</p>
+		<p class="hero-sub">Casual women's clothing for campus life and beyond. Delivered across Nigeria.</p>
+		<a href="/shop" class="btn btn-primary hero-cta">Shop the Collection</a>
 	</div>
 </section>
 
-<!-- Category quick-links -->
+<!-- Category chips -->
 {#if data.categories.length > 0}
-	<section class="categories-section" aria-labelledby="categories-heading">
+	<nav class="category-nav" aria-label="Shop by category">
 		<div class="page-container">
-			<h2 id="categories-heading" class="section-title">Shop by category</h2>
 			<ul class="category-row" role="list">
-				<li>
-					<a href="/shop" class="category-chip">All</a>
-				</li>
+				<li><a href="/shop" class="category-chip">All</a></li>
 				{#each data.categories as cat}
 					<li>
 						<a href="/shop?category={cat.name.toLowerCase()}" class="category-chip">{cat.name}</a>
@@ -54,15 +35,15 @@
 				{/each}
 			</ul>
 		</div>
-	</section>
+	</nav>
 {/if}
 
-<!-- Featured / New Arrivals -->
-<section class="featured-section" aria-labelledby="featured-heading">
+<!-- Catalogue -->
+<section class="catalogue-section" aria-label="Latest pieces">
 	<div class="page-container">
 		<div class="section-header">
-			<h2 id="featured-heading" class="section-title">New Arrivals</h2>
-			<a href="/shop" class="see-all">See all &rarr;</a>
+			<h2 class="section-title">Latest Pieces</h2>
+			<a href="/shop" class="see-all">View all &rarr;</a>
 		</div>
 
 		{#if data.featuredProducts.length === 0}
@@ -73,14 +54,12 @@
 					class="btn btn-outline"
 					target="_blank"
 					rel="noopener noreferrer"
-				>
-					Chat on WhatsApp
-				</a>
+				>Chat on WhatsApp</a>
 			</div>
 		{:else}
-			<ul class="product-grid" role="list">
+			<ul class="masonry-grid" role="list">
 				{#each data.featuredProducts as product (product.id)}
-					<li>
+					<li class="masonry-item">
 						<ProductCard {...product} />
 					</li>
 				{/each}
@@ -95,7 +74,7 @@
 		<ul class="usp-list" role="list">
 			<li class="usp-item">
 				<span class="usp-icon" aria-hidden="true">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
 						<path d="M9 12l2 2l4 -4" />
 					</svg>
@@ -104,7 +83,7 @@
 			</li>
 			<li class="usp-item">
 				<span class="usp-icon" aria-hidden="true">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M5 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
 						<path d="M19 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
 						<path d="M5 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
@@ -116,7 +95,7 @@
 			</li>
 			<li class="usp-item">
 				<span class="usp-icon" aria-hidden="true">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
 						<path d="M11 12l1 1l2 -2" />
 					</svg>
@@ -125,198 +104,65 @@
 			</li>
 			<li class="usp-item">
 				<span class="usp-icon" aria-hidden="true">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M12 3l1.45 4.05l4.3 .35l-3.3 2.85l1.05 4.25l-3.5 -2.15l-3.5 2.15l1.05 -4.25l-3.3 -2.85l4.3 -.35z" />
-						<path d="M6.818 20.04l-.318 .96" />
-						<path d="M17.5 21l-.5 -1" />
-						<path d="M3 11h1m16 0h1" />
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="7" width="18" height="13" rx="2" />
+						<path d="M8 7v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2" />
 					</svg>
 				</span>
-				<span>New styles weekly</span>
+				<span>Delivery across Nigeria</span>
 			</li>
 		</ul>
 	</div>
 </section>
 
 <style>
-	/* ── Hero ──────────────────────────────────────────────── */
+	/* ── Hero ─────────────────────────────────────────────────── */
 	.hero {
-		display: grid;
-		grid-template-columns: 1fr;
-		min-height: 65dvh;
-	}
-
-	@media (min-width: 768px) {
-		.hero {
-			grid-template-columns: 1fr 1fr;
-			min-height: 70dvh;
-		}
-	}
-
-	.hero-left {
 		background-color: var(--color-black-forest);
 		display: flex;
 		align-items: center;
+		justify-content: center;
+		min-height: 52dvh;
+		text-align: center;
 		padding: var(--space-2xl) var(--page-gutter-mobile);
 	}
 
-	@media (min-width: 768px) {
-		.hero-left {
-			justify-content: flex-end;
-			padding: var(--space-2xl) var(--space-2xl);
-		}
+	.hero-inner {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-lg);
+		max-width: 680px;
 	}
 
-	.hero-content {
-		max-width: 460px;
-		width: 100%;
-	}
-
-	.hero-eyebrow {
-		font-size: var(--text-small);
-		font-weight: 500;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--color-sunlit-clay);
-		margin-bottom: var(--space-md);
-		max-width: none;
-	}
-
-	.hero-heading {
-		font-size: var(--text-display);
+	.hero-wordmark {
+		font-family: var(--font-display);
+		font-size: clamp(28px, 6vw, 64px);
 		font-weight: 700;
 		color: var(--color-cornsilk);
-		line-height: 1.15;
-		margin-bottom: var(--space-md);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		line-height: 1.1;
+		max-width: none;
+		margin: 0;
 	}
 
 	.hero-sub {
 		font-size: var(--text-body);
-		color: rgba(254, 250, 224, 0.75);
-		margin-bottom: var(--space-xl);
+		color: rgba(254, 250, 224, 0.65);
 		line-height: var(--leading-normal);
+		max-width: 42ch;
+		margin: 0;
 	}
 
-	.hero-actions {
-		display: flex;
-		gap: var(--space-md);
-		flex-wrap: wrap;
+	.hero-cta {
+		min-width: 180px;
 	}
 
-	.btn-ghost-light {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 12px 24px;
-		border-radius: var(--radius-md);
-		font-size: var(--text-small);
-		font-weight: 500;
-		line-height: 1;
-		min-height: 44px;
-		cursor: pointer;
-		white-space: nowrap;
-		background: transparent;
-		color: var(--color-cornsilk);
-		border: 1.5px solid rgba(254, 250, 224, 0.4);
-		text-decoration: none;
-		transition: border-color var(--transition-fast), background-color var(--transition-fast);
-	}
-
-	.btn-ghost-light:hover {
-		border-color: var(--color-cornsilk);
-		background: rgba(254, 250, 224, 0.08);
-	}
-
-	.btn-ghost-light:focus-visible {
-		outline: 2px solid var(--color-sunlit-clay);
-		outline-offset: 2px;
-	}
-
-	/* Hero right: decorative panel */
-	.hero-right {
-		display: none;
-		background-color: var(--color-olive-leaf);
-		position: relative;
-		overflow: hidden;
-	}
-
-	@media (min-width: 768px) {
-		.hero-right {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-	}
-
-	.hero-art {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.hero-art-circle {
-		position: absolute;
-		border-radius: 50%;
-		background: rgba(254, 250, 224, 0.08);
-	}
-
-	.hero-art-circle-1 {
-		width: 70%;
-		aspect-ratio: 1;
-		top: -10%;
-		right: -10%;
-	}
-
-	.hero-art-circle-2 {
-		width: 50%;
-		aspect-ratio: 1;
-		bottom: -15%;
-		left: -5%;
-		background: rgba(188, 108, 37, 0.15);
-	}
-
-	.hero-art-text {
-		font-size: clamp(80px, 12vw, 140px);
-		font-weight: 700;
-		color: rgba(254, 250, 224, 0.12);
-		letter-spacing: -0.02em;
-		user-select: none;
-		z-index: 1;
-	}
-
-	/* ── Categories section ────────────────────────────────── */
-	.categories-section {
-		padding-block: var(--space-xl);
+	/* ── Category nav ─────────────────────────────────────────── */
+	.category-nav {
+		padding-block: var(--space-lg);
 		border-bottom: 1px solid var(--border-color);
-	}
-
-	.section-title {
-		font-size: var(--text-h2);
-		font-weight: 600;
-		color: var(--text-primary);
-		margin-bottom: var(--space-lg);
-	}
-
-	.section-header {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		margin-bottom: var(--space-lg);
-	}
-
-	.see-all {
-		font-size: var(--text-small);
-		font-weight: 500;
-		color: var(--text-secondary);
-		text-decoration: none;
-		transition: color var(--transition-fast);
-	}
-
-	.see-all:hover {
-		color: var(--color-copperwood);
 	}
 
 	.category-row {
@@ -328,7 +174,7 @@
 	.category-chip {
 		display: inline-flex;
 		align-items: center;
-		padding: 8px 20px;
+		padding: 7px 18px;
 		border-radius: 100px;
 		font-size: var(--text-small);
 		font-weight: 500;
@@ -336,8 +182,8 @@
 		background: var(--bg-card);
 		border: 1.5px solid var(--border-color);
 		text-decoration: none;
-		transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
-		min-height: 44px;
+		min-height: 40px;
+		transition: background-color 150ms, border-color 150ms, color 150ms;
 	}
 
 	.category-chip:hover {
@@ -346,33 +192,63 @@
 		border-color: var(--text-primary);
 	}
 
-	.category-chip:focus-visible {
-		outline: 2px solid var(--focus-ring);
-		outline-offset: 2px;
-	}
-
-	/* ── Featured section ──────────────────────────────────── */
-	.featured-section {
+	/* ── Catalogue section ────────────────────────────────────── */
+	.catalogue-section {
 		padding-block: var(--space-xl) var(--space-2xl);
 	}
 
-	.product-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: var(--space-md);
+	.section-header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: var(--space-lg);
 	}
 
-	@media (min-width: 768px) {
-		.product-grid {
-			grid-template-columns: repeat(3, 1fr);
-			gap: var(--space-lg);
-		}
+	.section-title {
+		font-size: var(--text-h2);
+		font-weight: 600;
+		color: var(--text-primary);
 	}
 
-	@media (min-width: 1280px) {
-		.product-grid {
-			grid-template-columns: repeat(4, 1fr);
-		}
+	.see-all {
+		font-size: var(--text-small);
+		font-weight: 500;
+		color: var(--text-secondary);
+		text-decoration: none;
+		transition: color 150ms;
+	}
+
+	.see-all:hover {
+		color: var(--color-copperwood);
+	}
+
+	/* Pinterest masonry via CSS columns */
+	.masonry-grid {
+		columns: 2;
+		column-gap: 10px;
+	}
+
+	@media (min-width: 640px) {
+		.masonry-grid { columns: 3; column-gap: 12px; }
+	}
+
+	@media (min-width: 1024px) {
+		.masonry-grid { columns: 4; column-gap: 14px; }
+	}
+
+	.masonry-item {
+		break-inside: avoid;
+		display: inline-block;
+		width: 100%;
+		margin-bottom: 10px;
+	}
+
+	@media (min-width: 640px) {
+		.masonry-item { margin-bottom: 12px; }
+	}
+
+	@media (min-width: 1024px) {
+		.masonry-item { margin-bottom: 14px; }
 	}
 
 	.empty-state {
@@ -385,10 +261,9 @@
 
 	.empty-state p {
 		color: var(--text-secondary);
-		font-size: var(--text-body);
 	}
 
-	/* ── USP strip ─────────────────────────────────────────── */
+	/* ── USP strip ────────────────────────────────────────────── */
 	.usp-strip {
 		background: var(--bg-card);
 		padding-block: var(--space-xl);
@@ -402,9 +277,7 @@
 	}
 
 	@media (min-width: 768px) {
-		.usp-list {
-			grid-template-columns: repeat(4, 1fr);
-		}
+		.usp-list { grid-template-columns: repeat(4, 1fr); }
 	}
 
 	.usp-item {

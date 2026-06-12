@@ -181,9 +181,9 @@
 			{/if}
 		</div>
 	{:else}
-		<ul class="product-grid" role="list">
+		<ul class="masonry-grid" role="list">
 			{#each data.products as product (product.id)}
-				<li><ProductCard {...product} /></li>
+				<li class="masonry-item"><ProductCard {...product} /></li>
 			{/each}
 		</ul>
 	{/if}
@@ -372,24 +372,33 @@
 		border-color: var(--color-copperwood);
 	}
 
-	/* Product grid */
-	.product-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: var(--space-md);
+	/* Pinterest masonry via CSS columns */
+	.masonry-grid {
+		columns: 2;
+		column-gap: 10px;
 	}
 
-	@media (min-width: 768px) {
-		.product-grid {
-			grid-template-columns: repeat(3, 1fr);
-			gap: var(--space-lg);
-		}
+	@media (min-width: 640px) {
+		.masonry-grid { columns: 3; column-gap: 12px; }
 	}
 
-	@media (min-width: 1280px) {
-		.product-grid {
-			grid-template-columns: repeat(4, 1fr);
-		}
+	@media (min-width: 1024px) {
+		.masonry-grid { columns: 4; column-gap: 14px; }
+	}
+
+	.masonry-item {
+		break-inside: avoid;
+		display: inline-block;
+		width: 100%;
+		margin-bottom: 10px;
+	}
+
+	@media (min-width: 640px) {
+		.masonry-item { margin-bottom: 12px; }
+	}
+
+	@media (min-width: 1024px) {
+		.masonry-item { margin-bottom: 14px; }
 	}
 
 	.empty-state {

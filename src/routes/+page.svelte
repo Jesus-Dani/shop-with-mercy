@@ -13,12 +13,40 @@
 	/>
 </svelte:head>
 
-<!-- Hero -->
-<section class="hero" aria-label="Welcome">
-	<div class="hero-inner">
-		<p class="hero-wordmark">Shop With Mercy</p>
-		<p class="hero-sub">Casual women's clothing for campus life and beyond. Delivered across Nigeria.</p>
-		<a href="/shop" class="btn btn-primary hero-cta">Shop the Collection</a>
+<!-- Hero – editorial split -->
+<section class="hero" aria-label="Shop With Mercy">
+	<div class="hero-panel hero-panel-left">
+		<img
+			src="/images/skirt.jpeg"
+			alt=""
+			aria-hidden="true"
+			class="hero-img"
+			loading="eager"
+			fetchpriority="high"
+			width="800"
+			height="1000"
+		/>
+		<div class="hero-text">
+			<p class="hero-wordmark">Shop With Mercy</p>
+			<p class="hero-sub">Casual women's clothing for campus life and beyond.</p>
+			<a href="/shop" class="btn btn-primary">Shop the Collection</a>
+		</div>
+	</div>
+
+	<div class="hero-panel hero-panel-right">
+		<img
+			src="/images/top.jpeg"
+			alt=""
+			aria-hidden="true"
+			class="hero-img"
+			loading="eager"
+			fetchpriority="high"
+			width="800"
+			height="1000"
+		/>
+		<div class="hero-right-cta">
+			<a href="/shop" class="hero-explore-link">Explore All &rarr;</a>
+		</div>
 	</div>
 </section>
 
@@ -118,45 +146,107 @@
 <style>
 	/* ── Hero ─────────────────────────────────────────────────── */
 	.hero {
-		background-color: var(--color-black-forest);
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 52dvh;
-		text-align: center;
-		padding: var(--space-2xl) var(--page-gutter-mobile);
+		flex-direction: column;
+		width: 100%;
+		min-height: 80dvh;
 	}
 
-	.hero-inner {
+	@media (min-width: 768px) {
+		.hero {
+			flex-direction: row;
+			height: 88dvh;
+			max-height: 880px;
+		}
+	}
+
+	.hero-panel {
+		position: relative;
+		overflow: hidden;
+		flex: 1;
+		min-height: 48dvh;
+		background: var(--color-black-forest);
+	}
+
+	@media (min-width: 768px) {
+		.hero-panel {
+			min-height: unset;
+		}
+	}
+
+	.hero-img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center top;
+		display: block;
+		transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	}
+
+	.hero-panel:hover .hero-img {
+		transform: scale(1.05);
+	}
+
+	.hero-text {
+		position: absolute;
+		inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
+		text-align: center;
 		gap: var(--space-lg);
-		max-width: 680px;
+		padding: var(--space-xl) var(--space-lg);
+		background: rgba(28, 38, 16, 0.42);
 	}
 
 	.hero-wordmark {
 		font-family: var(--font-display);
-		font-size: clamp(28px, 6vw, 64px);
-		font-weight: 700;
+		font-size: clamp(22px, 4.5vw, 52px);
+		font-weight: 400;
 		color: var(--color-cornsilk);
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
 		line-height: 1.1;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
 		max-width: none;
 		margin: 0;
 	}
 
 	.hero-sub {
 		font-size: var(--text-body);
-		color: rgba(254, 250, 224, 0.65);
+		color: rgba(254, 250, 224, 0.82);
 		line-height: var(--leading-normal);
-		max-width: 42ch;
+		max-width: 34ch;
 		margin: 0;
 	}
 
-	.hero-cta {
-		min-width: 180px;
+	.hero-right-cta {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: flex-end;
+		justify-content: flex-end;
+		padding: var(--space-xl);
+		background: rgba(28, 38, 16, 0.12);
+	}
+
+	.hero-explore-link {
+		font-size: var(--text-small);
+		font-weight: 600;
+		color: var(--color-cornsilk);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(254, 250, 224, 0.6);
+		padding-bottom: 3px;
+		transition: color var(--transition-fast), border-color var(--transition-fast);
+	}
+
+	.hero-explore-link:hover {
+		color: var(--color-sunlit-clay);
+		border-color: var(--color-sunlit-clay);
 	}
 
 	/* ── Category nav ─────────────────────────────────────────── */

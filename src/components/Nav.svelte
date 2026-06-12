@@ -206,8 +206,8 @@
 
 	.wordmark {
 		font-family: var(--font-display);
-		font-size: 15px;
-		font-weight: 700;
+		font-size: 16px;
+		font-weight: 400;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
 		color: var(--color-cornsilk);
@@ -221,7 +221,7 @@
 		.wordmark {
 			flex: 0 0 auto;
 			text-align: left;
-			font-size: 16px;
+			font-size: 17px;
 		}
 	}
 

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { LayoutData } from './$types';
-	let { data }: { data: LayoutData } = $props();
 </script>
 
 <svelte:head>
@@ -9,13 +7,26 @@
 
 <div class="dashboard">
 	<h1 class="dash-title">Dashboard</h1>
-	<p class="dash-sub">Welcome back, {data.adminUser.full_name || data.adminUser.email}.</p>
 
 	<div class="card-grid">
 		<a href="/admin/products" class="dash-card live">
 			<span class="card-icon">📦</span>
 			<h2 class="card-title">Products</h2>
 			<p class="card-body">Add, edit, and manage your catalogue with images and stock.</p>
+			<span class="badge-live">Open →</span>
+		</a>
+
+		<a href="/admin/orders" class="dash-card live">
+			<span class="card-icon">🛒</span>
+			<h2 class="card-title">Orders</h2>
+			<p class="card-body">View and manage customer orders, mark fulfilment status.</p>
+			<span class="badge-live">Open →</span>
+		</a>
+
+		<a href="/admin/inventory" class="dash-card live">
+			<span class="card-icon">📋</span>
+			<h2 class="card-title">Inventory</h2>
+			<p class="card-body">Stock levels at a glance — out, low, and healthy.</p>
 			<span class="badge-live">Open →</span>
 		</a>
 
@@ -34,30 +45,21 @@
 		</a>
 
 		<div class="dash-card coming">
-			<span class="card-icon">🛒</span>
-			<h2 class="card-title">Orders</h2>
-			<p class="card-body">View and manage customer orders, mark fulfilment status.</p>
-			<span class="badge-coming">Coming in Phase 7</span>
-		</div>
-
-		<div class="dash-card coming">
 			<span class="card-icon">📊</span>
 			<h2 class="card-title">Analytics</h2>
-			<p class="card-body">Revenue, best sellers, inventory, customer insights.</p>
-			<span class="badge-coming">Coming in Phase 8</span>
+			<p class="card-body">Revenue, best sellers, trends, and customer insights.</p>
+			<span class="badge-coming">Phase C</span>
 		</div>
 	</div>
 
 	<div class="quick-links">
 		<a href="/" class="btn btn-outline">View Storefront</a>
-		<a href="https://app.supabase.com" target="_blank" rel="noopener" class="btn btn-outline">Supabase Dashboard ↗</a>
 	</div>
 </div>
 
 <style>
 	.dashboard { display: flex; flex-direction: column; gap: var(--space-xl); }
 	.dash-title { font-size: var(--text-h1); }
-	.dash-sub { color: var(--text-secondary); }
 
 	.card-grid {
 		display: grid;
@@ -102,6 +104,7 @@
 		cursor: pointer;
 		transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 	}
+
 	.dash-card.live:hover {
 		border-color: var(--color-olive-leaf);
 		box-shadow: 0 2px 8px rgba(0,0,0,0.06);

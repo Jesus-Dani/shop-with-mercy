@@ -437,6 +437,30 @@ export interface Database {
 				Update: never;
 				Relationships: [];
 			};
+			page_events: {
+				Row: {
+					id: string;
+					event_type: string;
+					user_id: string | null;
+					product_id: string | null;
+					variant_id: string | null;
+					order_id: string | null;
+					meta: Json | null;
+					created_at: string;
+				};
+				Insert: {
+					id?: string;
+					event_type: string;
+					user_id?: string | null;
+					product_id?: string | null;
+					variant_id?: string | null;
+					order_id?: string | null;
+					meta?: Json | null;
+					created_at?: string;
+				};
+				Update: never;
+				Relationships: [];
+			};
 			failed_login_attempts: {
 				Row: {
 					id: string;

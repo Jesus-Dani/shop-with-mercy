@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { track } from './track';
 
 export interface CartItem {
 	variantId: string;
@@ -47,6 +48,7 @@ function add(item: Omit<CartItem, 'quantity'> & { quantity?: number }) {
 	}
 	persist(items);
 	drawerOpen = true;
+	if (browser) track('add_to_cart', { product_id: item.productId, variant_id: item.variantId });
 }
 
 function remove(variantId: string) {

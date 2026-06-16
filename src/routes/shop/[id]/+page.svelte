@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { formatNaira } from '$lib/format';
 	import { cdnUrl, cdnSrcset, HERO_SIZES } from '$lib/cloudinary';
 	import { cart } from '$lib/cart.svelte';
+	import { track } from '$lib/track';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -52,6 +54,10 @@
 	function starFilled(star: number, rating: number) {
 		return star <= Math.round(rating);
 	}
+
+	onMount(() => {
+		track('product_view', { product_id: data.product.id, meta: { name: data.product.name } });
+	});
 </script>
 
 <svelte:head>

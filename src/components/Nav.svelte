@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { theme, themeStore } from '$lib/theme';
 	import { cart } from '$lib/cart.svelte';
+	import { page } from '$app/stores';
 
 	interface Props {
 		wishlistCount?: number;
@@ -20,6 +21,11 @@
 		{ href: '/shop?category=tops', label: 'Tops' },
 		{ href: '/shop?category=skirts', label: 'Skirts' }
 	];
+
+	function isCurrent(href: string) {
+		const path = $page.url.pathname;
+		return href === '/shop' ? path === '/shop' : path.startsWith(href.split('?')[0]);
+	}
 </script>
 
 <!-- Skip to main content -->
@@ -56,7 +62,13 @@
 
 			<ul class="desktop-links" role="list">
 				{#each navLinks as link}
-					<li><a href={link.href} class="nav-link">{link.label}</a></li>
+					<li>
+						<a
+							href={link.href}
+							class="nav-link"
+							aria-current={isCurrent(link.href) ? 'page' : undefined}
+						>{link.label}</a>
+					</li>
 				{/each}
 			</ul>
 		</div>
@@ -156,12 +168,18 @@
 	class="drawer"
 	class:drawer-open={drawerOpen}
 	aria-hidden={!drawerOpen}
+	inert={!drawerOpen || undefined}
 >
 	<nav aria-label="Mobile navigation">
 		<ul role="list">
 			{#each navLinks as link}
 				<li>
-					<a href={link.href} class="drawer-link" onclick={closeDrawer}>{link.label}</a>
+					<a
+						href={link.href}
+						class="drawer-link"
+						aria-current={isCurrent(link.href) ? 'page' : undefined}
+						onclick={closeDrawer}
+					>{link.label}</a>
 				</li>
 			{/each}
 			<li class="drawer-divider"></li>

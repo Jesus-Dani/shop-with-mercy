@@ -19,6 +19,10 @@ mkdirSync(OUT_DIR, { recursive: true });
 copyFileSync(resolve(root, 'src/netlify-functions/ping.mjs'), resolve(OUT_DIR, 'ping.mjs'));
 console.log('[bundle-lambda] ping.mjs copied to netlify/functions/');
 
+// ── weekly digest (scheduled, zero npm deps — uses Supabase REST + Resend API) ──
+copyFileSync(resolve(root, 'src/netlify-functions/weekly-digest.mjs'), resolve(OUT_DIR, 'weekly-digest.mjs'));
+console.log('[bundle-lambda] weekly-digest.mjs copied to netlify/functions/');
+
 // ── main SvelteKit function ────────────────────────────────────────────────
 if (!existsSync(SRC)) {
 	console.log('[bundle-lambda] No sveltekit-render.mjs found — skipping bundle step');

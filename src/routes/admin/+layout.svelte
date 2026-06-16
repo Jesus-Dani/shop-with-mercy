@@ -14,8 +14,7 @@
 			<a href="/admin/orders" class="admin-link">Orders</a>
 		</nav>
 		<div class="admin-user">
-			<span class="admin-email">{data.adminUser.email}</span>
-			<form method="POST" action="/auth/signout">
+			<form method="POST" action="/admin/logout">
 				<button type="submit" class="sign-out-btn">Sign out</button>
 			</form>
 		</div>
@@ -80,16 +79,6 @@
 		align-items: center;
 		gap: var(--space-md);
 		flex-shrink: 0;
-	}
-
-	.admin-email {
-		font-size: var(--text-micro);
-		color: rgba(254, 250, 224, 0.55);
-		display: none;
-	}
-
-	@media (min-width: 640px) {
-		.admin-email { display: block; }
 	}
 
 	.sign-out-btn {

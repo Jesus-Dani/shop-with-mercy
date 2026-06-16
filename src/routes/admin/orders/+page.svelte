@@ -99,7 +99,7 @@
 								{#if VALID_NEXT[order.status]?.length}
 									<form method="POST" action="?/updateStatus" use:enhance>
 										<input type="hidden" name="id" value={order.id} />
-										<select name="status" class="status-select" onchange="this.form.requestSubmit()">
+										<select name="status" class="status-select" onchange={(e) => e.currentTarget.closest('form')?.requestSubmit()}>
 											<option value="" disabled selected>Move to…</option>
 											{#each VALID_NEXT[order.status] as next}
 												<option value={next}>{STATUS_LABELS[next]}</option>

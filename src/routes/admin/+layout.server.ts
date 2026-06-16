@@ -19,11 +19,14 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		throw error(403, 'Access denied.');
 	}
 
+	const meta = session.user.user_metadata ?? {};
+	const fullName = ((meta.full_name ?? meta.name ?? '') as string);
+
 	return {
 		adminUser: {
 			id: session.user.id,
 			email: session.user.email ?? '',
-			full_name: (session.user.user_metadata?.full_name as string | undefined) ?? ''
+			full_name: fullName
 		}
 	};
 };

@@ -25,25 +25,26 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.auth.signInWithPassword({ email, password });
 
 		if (error) {
-			return fail(400, { error: 'Invalid email or password.', email });
+			console.error('[sign-in] error:', error.code, error.message);
+
+			if (error.code === 'email_not_confirmed') {
+				return fail(400, {
+					error: 'Please confirm your email before signing in. Check your inbox for a confirmation link.',
+					email
+				});
+			}
+
+			if (error.status === 400 || error.code === 'invalid_credentials') {
+				return fail(400, { error: 'Invalid email or password.', email });
+			}
+
+			return fail(400, {
+				error: error.message || 'Sign-in failed. Please try again.',
+				email
+			});
 		}
 
 		throw redirect(303, next.startsWith('/') ? next : '/account');
 	},
 
-	google: async ({ locals, url }) => {
-		const next = url.searchParams.get('next') ?? '/account';
-		const { data, error } = await locals.supabase.auth.signInWithOAuth({
-			provider: 'google',
-			options: {
-				redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`
-			}
-		});
-
-		if (error || !data.url) {
-			return fail(500, { error: 'Could not start Google sign-in. Please try again.' });
-		}
-
-		throw redirect(303, data.url);
-	}
 };

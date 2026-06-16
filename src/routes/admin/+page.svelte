@@ -12,12 +12,26 @@
 	<p class="dash-sub">Welcome back, {data.adminUser.full_name || data.adminUser.email}.</p>
 
 	<div class="card-grid">
-		<div class="dash-card coming">
+		<a href="/admin/products" class="dash-card live">
 			<span class="card-icon">📦</span>
 			<h2 class="card-title">Products</h2>
 			<p class="card-body">Add, edit, and manage your catalogue with images and stock.</p>
-			<span class="badge-coming">Coming in Phase 4</span>
-		</div>
+			<span class="badge-live">Open →</span>
+		</a>
+
+		<a href="/admin/categories" class="dash-card live">
+			<span class="card-icon">🏷️</span>
+			<h2 class="card-title">Categories</h2>
+			<p class="card-body">Create and manage product categories.</p>
+			<span class="badge-live">Open →</span>
+		</a>
+
+		<a href="/admin/reviews" class="dash-card live">
+			<span class="card-icon">⭐</span>
+			<h2 class="card-title">Reviews</h2>
+			<p class="card-body">Moderate customer reviews — hide, restore, or delete.</p>
+			<span class="badge-live">Open →</span>
+		</a>
 
 		<div class="dash-card coming">
 			<span class="card-icon">🛒</span>
@@ -80,6 +94,29 @@
 		font-size: var(--text-small);
 		color: var(--text-secondary);
 		flex: 1;
+	}
+
+	.dash-card.live {
+		text-decoration: none;
+		color: inherit;
+		cursor: pointer;
+		transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+	}
+	.dash-card.live:hover {
+		border-color: var(--color-olive-leaf);
+		box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+	}
+
+	.badge-live {
+		display: inline-block;
+		font-size: var(--text-micro);
+		font-weight: 600;
+		color: var(--color-olive-leaf);
+		background: rgba(96, 108, 56, 0.12);
+		border: 1px solid rgba(96, 108, 56, 0.3);
+		border-radius: 100px;
+		padding: 3px 10px;
+		align-self: flex-start;
 	}
 
 	.badge-coming {

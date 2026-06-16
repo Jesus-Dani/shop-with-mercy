@@ -8,11 +8,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		throw redirect(303, `/auth/sign-in?next=${encodeURIComponent(url.pathname)}`);
 	}
 
+	const meta = session.user.user_metadata ?? {};
+	const fullName = ((meta.full_name ?? meta.name ?? '') as string);
+
 	return {
 		user: {
 			id: session.user.id,
 			email: session.user.email ?? '',
-			full_name: (session.user.user_metadata?.full_name as string | undefined) ?? ''
+			full_name: fullName
 		}
 	};
 };

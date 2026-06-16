@@ -30,6 +30,7 @@ export interface Database {
 					sort_order?: number;
 					created_at?: string;
 				};
+				Relationships: [];
 			};
 			products: {
 				Row: {
@@ -68,6 +69,15 @@ export interface Database {
 					created_at?: string;
 					updated_at?: string;
 				};
+				Relationships: [
+					{
+						foreignKeyName: 'products_category_id_fkey';
+						columns: ['category_id'];
+						isOneToOne: false;
+						referencedRelation: 'categories';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			product_colours: {
 				Row: {
@@ -94,6 +104,15 @@ export interface Database {
 					sort_order?: number;
 					created_at?: string;
 				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_colours_product_id_fkey';
+						columns: ['product_id'];
+						isOneToOne: false;
+						referencedRelation: 'products';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			product_images: {
 				Row: {
@@ -117,6 +136,15 @@ export interface Database {
 					sort_order?: number;
 					created_at?: string;
 				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_images_product_colour_id_fkey';
+						columns: ['product_colour_id'];
+						isOneToOne: false;
+						referencedRelation: 'product_colours';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			product_variants: {
 				Row: {
@@ -143,6 +171,15 @@ export interface Database {
 					created_at?: string;
 					updated_at?: string;
 				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_variants_product_colour_id_fkey';
+						columns: ['product_colour_id'];
+						isOneToOne: false;
+						referencedRelation: 'product_colours';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			orders: {
 				Row: {
@@ -190,6 +227,7 @@ export interface Database {
 					created_at?: string;
 					updated_at?: string;
 				};
+				Relationships: [];
 			};
 			order_items: {
 				Row: {
@@ -225,6 +263,15 @@ export interface Database {
 					unit_price?: number;
 					cost_price?: number | null;
 				};
+				Relationships: [
+					{
+						foreignKeyName: 'order_items_order_id_fkey';
+						columns: ['order_id'];
+						isOneToOne: false;
+						referencedRelation: 'orders';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			cart_items: {
 				Row: {
@@ -248,6 +295,7 @@ export interface Database {
 					quantity?: number;
 					added_at?: string;
 				};
+				Relationships: [];
 			};
 			wishlist_items: {
 				Row: {
@@ -268,6 +316,7 @@ export interface Database {
 					product_variant_id?: string;
 					added_at?: string;
 				};
+				Relationships: [];
 			};
 			restock_notifications: {
 				Row: {
@@ -294,6 +343,7 @@ export interface Database {
 					notified_at?: string | null;
 					created_at?: string;
 				};
+				Relationships: [];
 			};
 			reviews: {
 				Row: {
@@ -326,6 +376,15 @@ export interface Database {
 					is_visible?: boolean;
 					created_at?: string;
 				};
+				Relationships: [
+					{
+						foreignKeyName: 'reviews_product_id_fkey';
+						columns: ['product_id'];
+						isOneToOne: false;
+						referencedRelation: 'products';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			pinterest_pins: {
 				Row: {
@@ -352,6 +411,7 @@ export interface Database {
 					pin_title?: string | null;
 					fetched_at?: string;
 				};
+				Relationships: [];
 			};
 			admin_audit_log: {
 				Row: {
@@ -375,6 +435,7 @@ export interface Database {
 					created_at?: string;
 				};
 				Update: never;
+				Relationships: [];
 			};
 			admin_users: {
 				Row: {
@@ -392,6 +453,7 @@ export interface Database {
 					user_id?: string;
 					created_at?: string;
 				};
+				Relationships: [];
 			};
 			profiles: {
 				Row: {
@@ -430,6 +492,7 @@ export interface Database {
 					created_at?: string;
 					updated_at?: string;
 				};
+				Relationships: [];
 			};
 		};
 		Views: Record<string, never>;

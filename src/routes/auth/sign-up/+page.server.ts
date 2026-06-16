@@ -30,10 +30,18 @@ export const actions: Actions = {
 		});
 
 		if (error) {
-			const msg = error.message.toLowerCase().includes('already')
-				? 'An account with this email already exists. Try signing in.'
-				: 'Could not create your account. Please try again.';
-			return fail(400, { error: msg, name, email });
+			console.error('[sign-up] error:', error.code, error.status, error.message);
+
+			if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('already exists')) {
+				return fail(400, { error: 'An account with this email already exists. Try signing in.', name, email });
+			}
+			if (error.message.toLowerCase().includes('password')) {
+				return fail(400, { error: error.message, name, email });
+			}
+			if (error.status === 0 || error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network')) {
+				return fail(500, { error: 'Could not reach the server. Check your internet connection and try again.', name, email });
+			}
+			return fail(400, { error: error.message || 'Could not create your account. Please try again.', name, email });
 		}
 
 		// If email confirmation disabled in Supabase → session exists immediately
@@ -43,16 +51,4 @@ export const actions: Actions = {
 		return { success: true, email };
 	},
 
-	google: async ({ locals, url }) => {
-		const { data, error } = await locals.supabase.auth.signInWithOAuth({
-			provider: 'google',
-			options: { redirectTo: `${url.origin}/auth/callback` }
-		});
-
-		if (error || !data.url) {
-			return fail(500, { error: 'Could not start Google sign-in. Please try again.' });
-		}
-
-		throw redirect(303, data.url);
-	}
 };

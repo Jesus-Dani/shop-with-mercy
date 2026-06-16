@@ -9,6 +9,8 @@
 		<a href="/admin" class="admin-brand">SWM Admin</a>
 		<nav class="admin-links">
 			<a href="/admin/products" class="admin-link">Products</a>
+			<a href="/admin/categories" class="admin-link">Categories</a>
+			<a href="/admin/reviews" class="admin-link">Reviews</a>
 			<a href="/admin/orders" class="admin-link">Orders</a>
 		</nav>
 		<div class="admin-user">

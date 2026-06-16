@@ -1,8 +1,9 @@
-import { createSupabaseServerClient } from '$lib/supabase';
+import { createSupabaseServerClient, createSupabaseServiceClient } from '$lib/supabase';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createSupabaseServerClient(event.fetch, event.cookies);
+	event.locals.supabaseAdmin = createSupabaseServiceClient(event.fetch);
 
 	// safeGetSession validates the session JWT before trusting it.
 	// Returns null (unauthenticated) on any error — never throws.

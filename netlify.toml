@@ -10,3 +10,9 @@
   to     = "/.netlify/functions/sveltekit-render"
   status = 200
   force  = false
+
+# Rate limiting on /admin/login requires a Netlify Pro plan.
+# Configure it in the Netlify dashboard: Site → Security → Traffic rules
+# Recommended rule: block after 5 requests per 60 s per IP on path /admin/login.
+# Application-level rate limiting (via Supabase failed_login_attempts) is also
+# implemented in the login action as a fallback that works on any plan.

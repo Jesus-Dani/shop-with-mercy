@@ -4,6 +4,10 @@
 	let { data, children }: { data: LayoutData; children: import('svelte').Snippet } = $props();
 </script>
 
+<svelte:head>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 <div class="admin-shell">
 	<header class="admin-nav">
 		<a href="/admin" class="admin-brand">SWM Admin</a>

@@ -437,6 +437,24 @@ export interface Database {
 				Update: never;
 				Relationships: [];
 			};
+			failed_login_attempts: {
+				Row: {
+					id: string;
+					ip: string;
+					attempted_at: string;
+				};
+				Insert: {
+					id?: string;
+					ip: string;
+					attempted_at?: string;
+				};
+				Update: {
+					id?: string;
+					ip?: string;
+					attempted_at?: string;
+				};
+				Relationships: [];
+			};
 			admin_users: {
 				Row: {
 					id: string;

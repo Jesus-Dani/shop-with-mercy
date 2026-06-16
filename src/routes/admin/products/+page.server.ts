@@ -1,4 +1,5 @@
 import { fail } from '@sveltejs/kit';
+import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -31,6 +32,7 @@ export const actions: Actions = {
 			.eq('id', id);
 
 		if (error) return fail(500, { error: error.message });
+		logAudit(locals.supabaseAdmin, !published ? 'product.publish' : 'product.unpublish', 'products', id);
 		return { success: true };
 	},
 
@@ -40,6 +42,7 @@ export const actions: Actions = {
 
 		const { error } = await locals.supabase.from('products').delete().eq('id', id);
 		if (error) return fail(500, { error: error.message });
+		logAudit(locals.supabaseAdmin, 'product.delete', 'products', id);
 		return { success: true };
 	}
 };

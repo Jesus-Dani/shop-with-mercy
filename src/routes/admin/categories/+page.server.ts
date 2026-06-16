@@ -1,4 +1,5 @@
 import { fail } from '@sveltejs/kit';
+import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -24,8 +25,13 @@ export const actions: Actions = {
 			.limit(1);
 
 		const sortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
-		const { error } = await locals.supabase.from('categories').insert({ name, sort_order: sortOrder });
+		const { data: cat, error } = await locals.supabase
+			.from('categories')
+			.insert({ name, sort_order: sortOrder })
+			.select('id')
+			.single();
 		if (error) return fail(500, { action: 'create', error: error.message });
+		logAudit(locals.supabaseAdmin, 'category.create', 'categories', cat.id, { new: { name } });
 		return { action: 'create', success: true };
 	},
 
@@ -37,6 +43,7 @@ export const actions: Actions = {
 
 		const { error } = await locals.supabase.from('categories').update({ name }).eq('id', id);
 		if (error) return fail(500, { action: 'rename', error: error.message });
+		logAudit(locals.supabaseAdmin, 'category.rename', 'categories', id, { new: { name } });
 		return { action: 'rename', success: true };
 	},
 
@@ -49,6 +56,7 @@ export const actions: Actions = {
 
 		const { error } = await locals.supabase.from('categories').delete().eq('id', id);
 		if (error) return fail(500, { action: 'delete', error: error.message });
+		logAudit(locals.supabaseAdmin, 'category.delete', 'categories', id);
 		return { action: 'delete', success: true };
 	}
 };

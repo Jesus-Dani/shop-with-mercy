@@ -1,4 +1,5 @@
 import { fail, redirect, error } from '@sveltejs/kit';
+import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const;
@@ -66,6 +67,7 @@ export const actions: Actions = {
 			.eq('id', params.id);
 
 		if (err) return fail(500, { action: 'updateProduct', error: err.message });
+		logAudit(locals.supabaseAdmin, 'product.update', 'products', params.id, { new: { name, price, published } });
 		return { action: 'updateProduct', success: true };
 	},
 
@@ -104,6 +106,7 @@ export const actions: Actions = {
 			SIZES.map((size) => ({ product_colour_id: colour.id, size, stock_quantity: 0 }))
 		);
 
+		logAudit(locals.supabaseAdmin, 'colour.add', 'product_colours', colour.id, { new: { colour_name: colourName } });
 		return { action: 'addColour', success: true };
 	},
 
@@ -118,6 +121,7 @@ export const actions: Actions = {
 			.eq('product_id', params.id);
 
 		if (err) return fail(500, { action: 'deleteColour', error: err.message });
+		logAudit(locals.supabaseAdmin, 'colour.delete', 'product_colours', colourId);
 		return { action: 'deleteColour', success: true };
 	},
 
@@ -158,7 +162,7 @@ export const actions: Actions = {
 		return { action: 'deleteImage', success: true };
 	},
 
-	updateStock: async ({ request, locals }) => {
+	updateStock: async ({ request, locals, params }) => {
 		const form = await request.formData();
 		const entries = [...form.entries()].filter(([k]) => k.startsWith('variant_'));
 
@@ -176,6 +180,7 @@ export const actions: Actions = {
 
 		const failed = results.find((r) => r.error);
 		if (failed?.error) return fail(500, { action: 'updateStock', error: failed.error.message });
+		logAudit(locals.supabaseAdmin, 'stock.update', 'product_variants', params.id);
 		return { action: 'updateStock', success: true };
 	},
 
@@ -186,6 +191,7 @@ export const actions: Actions = {
 			.eq('id', params.id);
 
 		if (err) return fail(500, { action: 'deleteProduct', error: err.message });
+		logAudit(locals.supabaseAdmin, 'product.delete', 'products', params.id);
 		throw redirect(303, '/admin/products');
 	}
 };

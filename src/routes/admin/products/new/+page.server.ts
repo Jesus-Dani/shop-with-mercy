@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -59,6 +60,7 @@ export const actions: Actions = {
 			return fail(500, { error: 'Could not create product. Please try again.', fields: { name, description } });
 		}
 
+		logAudit(locals.supabaseAdmin, 'product.create', 'products', product.id, { new: { name, price } });
 		throw redirect(303, `/admin/products/${product.id}`);
 	}
 };

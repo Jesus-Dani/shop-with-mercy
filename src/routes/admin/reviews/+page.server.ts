@@ -1,4 +1,5 @@
 import { fail } from '@sveltejs/kit';
+import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -23,6 +24,7 @@ export const actions: Actions = {
 			.eq('id', id);
 
 		if (error) return fail(500, { error: error.message });
+		logAudit(locals.supabaseAdmin, !visible ? 'review.show' : 'review.hide', 'reviews', id);
 		return { success: true };
 	},
 
@@ -32,6 +34,7 @@ export const actions: Actions = {
 
 		const { error } = await locals.supabase.from('reviews').delete().eq('id', id);
 		if (error) return fail(500, { error: error.message });
+		logAudit(locals.supabaseAdmin, 'review.delete', 'reviews', id);
 		return { success: true };
 	}
 };

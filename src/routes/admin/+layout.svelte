@@ -18,6 +18,7 @@
 			<a href="/admin/categories" class="admin-link">Categories</a>
 			<a href="/admin/reviews" class="admin-link">Reviews</a>
 			<a href="/admin/analytics" class="admin-link">Analytics</a>
+			<a href="/admin/customers" class="admin-link">Customers</a>
 		</nav>
 		<div class="admin-user">
 			<form method="POST" action="/admin/logout">

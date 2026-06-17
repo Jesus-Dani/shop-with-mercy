@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const status = url.searchParams.get('status') ?? 'all';
 	const q = url.searchParams.get('q') ?? '';
 
-	let query = locals.supabase
+	let query = locals.supabaseAdmin
 		.from('orders')
 		.select('id, order_number, customer_name, customer_email, status, subtotal, delivery_type, created_at')
 		.order('created_at', { ascending: false });
@@ -35,7 +35,7 @@ export const actions: Actions = {
 		const id = String(form.get('id') ?? '');
 		const newStatus = String(form.get('status') ?? '');
 
-		const { data: order, error: fetchErr } = await locals.supabase
+		const { data: order, error: fetchErr } = await locals.supabaseAdmin
 			.from('orders')
 			.select('status')
 			.eq('id', id)
@@ -48,7 +48,7 @@ export const actions: Actions = {
 			return fail(400, { error: `Cannot move from ${order.status} to ${newStatus}.` });
 		}
 
-		const { error } = await locals.supabase
+		const { error } = await locals.supabaseAdmin
 			.from('orders')
 			.update({ status: newStatus as any, updated_at: new Date().toISOString() })
 			.eq('id', id);

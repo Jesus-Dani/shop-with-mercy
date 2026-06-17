@@ -3,7 +3,7 @@ import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const { data: reviews, error } = await locals.supabase
+	const { data: reviews, error } = await locals.supabaseAdmin
 		.from('reviews')
 		.select('*, products(name)')
 		.order('created_at', { ascending: false });
@@ -18,7 +18,7 @@ export const actions: Actions = {
 		const id = String(form.get('id') ?? '');
 		const visible = form.get('is_visible') === 'true';
 
-		const { error } = await locals.supabase
+		const { error } = await locals.supabaseAdmin
 			.from('reviews')
 			.update({ is_visible: !visible })
 			.eq('id', id);
@@ -32,7 +32,7 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const id = String(form.get('id') ?? '');
 
-		const { error } = await locals.supabase.from('reviews').delete().eq('id', id);
+		const { error } = await locals.supabaseAdmin.from('reviews').delete().eq('id', id);
 		if (error) return fail(500, { error: error.message });
 		logAudit(locals.supabaseAdmin, 'review.delete', 'reviews', id);
 		return { success: true };

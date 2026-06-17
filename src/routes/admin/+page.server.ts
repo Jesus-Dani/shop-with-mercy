@@ -78,7 +78,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	// Parallel: paid orders in range, all-orders status counts, active products, low stock
 	const [paidRes, allStatusRes, productsRes, lowStockRes] = await Promise.all([
 		(() => {
-			let q = locals.supabase
+			let q = locals.supabaseAdmin
 				.from('orders')
 				.select('id, subtotal, created_at')
 				.neq('status', 'cancelled')
@@ -87,15 +87,15 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			return q;
 		})(),
 		(() => {
-			let q = locals.supabase.from('orders').select('status');
+			let q = locals.supabaseAdmin.from('orders').select('status');
 			if (from) q = q.gte('created_at', from);
 			return q;
 		})(),
-		locals.supabase
+		locals.supabaseAdmin
 			.from('products')
 			.select('id', { count: 'exact', head: true })
 			.eq('published', true),
-		locals.supabase
+		locals.supabaseAdmin
 			.from('product_variants')
 			.select('id, size, stock_quantity, product_colours(colour_name, products(name))')
 			.lte('stock_quantity', 5)
@@ -112,7 +112,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const orderIds = paidOrders.map((o: any) => o.id);
 	let items: any[] = [];
 	if (orderIds.length > 0) {
-		const { data } = await locals.supabase
+		const { data } = await locals.supabaseAdmin
 			.from('order_items')
 			.select(
 				'product_name, quantity, unit_price, product_variants(product_colours(products(categories(name))))'

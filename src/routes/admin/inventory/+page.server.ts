@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const filter = url.searchParams.get('filter') ?? 'all'; // all | low | out
 
-	let query = locals.supabase
+	let query = locals.supabaseAdmin
 		.from('product_variants')
 		.select(
 			'id, size, stock_quantity, product_colours(colour_name, colour_hex, products(id, name, published, categories(name)))'

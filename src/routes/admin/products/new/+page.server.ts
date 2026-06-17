@@ -3,7 +3,7 @@ import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const { data: categories } = await locals.supabase
+	const { data: categories } = await locals.supabaseAdmin
 		.from('categories')
 		.select('id, name')
 		.order('sort_order');
@@ -31,7 +31,7 @@ export const actions: Actions = {
 		let finalCategoryId = categoryId;
 
 		if (newCategory) {
-			const { data: existing } = await locals.supabase
+			const { data: existing } = await locals.supabaseAdmin
 				.from('categories')
 				.select('sort_order')
 				.order('sort_order', { ascending: false })
@@ -39,7 +39,7 @@ export const actions: Actions = {
 
 			const sortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
 
-			const { data: cat, error: catErr } = await locals.supabase
+			const { data: cat, error: catErr } = await locals.supabaseAdmin
 				.from('categories')
 				.insert({ name: newCategory, sort_order: sortOrder })
 				.select('id')
@@ -49,7 +49,7 @@ export const actions: Actions = {
 			finalCategoryId = cat.id;
 		}
 
-		const { data: product, error } = await locals.supabase
+		const { data: product, error } = await locals.supabaseAdmin
 			.from('products')
 			.insert({ name, description, category_id: finalCategoryId, price, sale_price: salePrice, cost_price: costPrice, published })
 			.select('id')

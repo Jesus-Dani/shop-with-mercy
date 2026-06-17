@@ -118,7 +118,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	let viewedNotBought: Array<{name: string; views: number; carts: number; cartRate: number}> = [];
 	if (topViewed.length > 0) {
 		const ids = topViewed.map(([id]) => id);
-		const { data: products } = await locals.supabase
+		const { data: products } = await locals.supabaseAdmin
 			.from('products')
 			.select('id, name')
 			.in('id', ids);

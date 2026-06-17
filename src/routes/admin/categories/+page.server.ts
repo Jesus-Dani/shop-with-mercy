@@ -3,7 +3,7 @@ import { logAudit } from '$lib/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const { data: categories, error } = await locals.supabase
+	const { data: categories, error } = await locals.supabaseAdmin
 		.from('categories')
 		.select('id, name, sort_order')
 		.order('sort_order');
@@ -18,14 +18,14 @@ export const actions: Actions = {
 		const name = String(form.get('name') ?? '').trim();
 		if (!name) return fail(400, { action: 'create', error: 'Name is required.' });
 
-		const { data: existing } = await locals.supabase
+		const { data: existing } = await locals.supabaseAdmin
 			.from('categories')
 			.select('sort_order')
 			.order('sort_order', { ascending: false })
 			.limit(1);
 
 		const sortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
-		const { data: cat, error } = await locals.supabase
+		const { data: cat, error } = await locals.supabaseAdmin
 			.from('categories')
 			.insert({ name, sort_order: sortOrder })
 			.select('id')
@@ -41,7 +41,7 @@ export const actions: Actions = {
 		const name = String(form.get('name') ?? '').trim();
 		if (!name) return fail(400, { action: 'rename', error: 'Name is required.' });
 
-		const { error } = await locals.supabase.from('categories').update({ name }).eq('id', id);
+		const { error } = await locals.supabaseAdmin.from('categories').update({ name }).eq('id', id);
 		if (error) return fail(500, { action: 'rename', error: error.message });
 		logAudit(locals.supabaseAdmin, 'category.rename', 'categories', id, { new: { name } });
 		return { action: 'rename', success: true };
@@ -52,9 +52,9 @@ export const actions: Actions = {
 		const id = String(form.get('id') ?? '');
 
 		// Unlink products from this category first
-		await locals.supabase.from('products').update({ category_id: null }).eq('category_id', id);
+		await locals.supabaseAdmin.from('products').update({ category_id: null }).eq('category_id', id);
 
-		const { error } = await locals.supabase.from('categories').delete().eq('id', id);
+		const { error } = await locals.supabaseAdmin.from('categories').delete().eq('id', id);
 		if (error) return fail(500, { action: 'delete', error: error.message });
 		logAudit(locals.supabaseAdmin, 'category.delete', 'categories', id);
 		return { action: 'delete', success: true };

@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			)
 			.eq('id', params.id)
 			.single(),
-		locals.supabase.from('categories').select('id, name').order('sort_order')
+		locals.supabaseAdmin.from('categories').select('id, name').order('sort_order')
 	]);
 
 	if (productRes.error || !productRes.data) throw error(404, 'Product not found');
@@ -102,7 +102,7 @@ export const actions: Actions = {
 		if (colErr) return fail(500, { action: 'addColour', error: colErr.message });
 
 		// Create all size variants at 0 stock
-		await locals.supabase.from('product_variants').insert(
+		await locals.supabaseAdmin.from('product_variants').insert(
 			SIZES.map((size) => ({ product_colour_id: colour.id, size, stock_quantity: 0 }))
 		);
 

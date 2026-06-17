@@ -172,37 +172,43 @@
 >
 	<nav aria-label="Mobile navigation">
 		<ul role="list">
+			<!-- Primary navigation -->
 			<li>
-				<a
-					href="/"
-					class="drawer-link"
-					aria-current={$page.url.pathname === '/' ? 'page' : undefined}
-					onclick={closeDrawer}
-				>Home</a>
+				<a href="/" class="drawer-link" aria-current={$page.url.pathname === '/' ? 'page' : undefined} onclick={closeDrawer}>Home</a>
 			</li>
 			{#each navLinks as link}
 				<li>
-					<a
-						href={link.href}
-						class="drawer-link"
-						aria-current={isCurrent(link.href) ? 'page' : undefined}
-						onclick={closeDrawer}
-					>{link.label}</a>
+					<a href={link.href} class="drawer-link" aria-current={isCurrent(link.href) ? 'page' : undefined} onclick={closeDrawer}>{link.label}</a>
 				</li>
 			{/each}
-			<li class="drawer-divider"></li>
+
+			<li class="drawer-divider" role="separator"></li>
+
+			<!-- Utility -->
 			<li>
-				<a href="/search" class="drawer-link" onclick={closeDrawer}>
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:-2px;margin-right:6px"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>Search
-				</a>
+				<a href="/search" class="drawer-link" onclick={closeDrawer}>Search</a>
 			</li>
-			<li>
-				<a href={user ? '/account' : '/auth/sign-in'} class="drawer-link" onclick={closeDrawer}>
-					{user ? `My Account (${user.full_name.split(' ')[0]})` : 'Sign in'}
-				</a>
-			</li>
+			{#if user}
+				<li>
+					<a href="/account/wishlist" class="drawer-link" onclick={closeDrawer}>Wishlist</a>
+				</li>
+				<li>
+					<a href="/account" class="drawer-link" onclick={closeDrawer}>My Account</a>
+				</li>
+			{:else}
+				<li>
+					<a href="/auth/sign-in" class="drawer-link" onclick={closeDrawer}>Sign in</a>
+				</li>
+			{/if}
+
+			<li class="drawer-divider" role="separator"></li>
+
+			<!-- Policies -->
 			<li>
 				<a href="/refund-policy" class="drawer-link" onclick={closeDrawer}>Refund Policy</a>
+			</li>
+			<li>
+				<a href="/privacy" class="drawer-link" onclick={closeDrawer}>Privacy Policy</a>
 			</li>
 		</ul>
 	</nav>

@@ -9,7 +9,7 @@
 	<title>Shop With Mercy — Casual Women's Clothing</title>
 	<meta
 		name="description"
-		content="Shop With Mercy — casual women's clothing for campus life and beyond. Based in Nigeria."
+		content="Shop With Mercy — casual women's clothing for everyday life. Based in Nigeria."
 	/>
 </svelte:head>
 
@@ -40,7 +40,7 @@
 	</div>
 	<div class="hero-overlay">
 		<p class="hero-wordmark">Shop With Mercy</p>
-		<p class="hero-sub">Casual women's clothing for campus life and beyond.</p>
+		<p class="hero-sub">Casual women's clothing for everyday life.</p>
 		<a href="/shop" class="btn btn-primary">Shop the Collection</a>
 	</div>
 </section>

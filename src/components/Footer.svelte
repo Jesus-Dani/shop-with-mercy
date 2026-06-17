@@ -8,7 +8,7 @@
 			<!-- Brand column -->
 			<div class="footer-brand">
 				<p class="footer-wordmark">Shop With Mercy</p>
-				<p class="footer-tagline">Casual women's clothing. Campus and beyond.</p>
+				<p class="footer-tagline">Casual women's clothing for everyday life.</p>
 			</div>
 
 			<!-- Links column -->

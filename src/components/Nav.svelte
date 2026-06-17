@@ -172,6 +172,14 @@
 >
 	<nav aria-label="Mobile navigation">
 		<ul role="list">
+			<li>
+				<a
+					href="/"
+					class="drawer-link"
+					aria-current={$page.url.pathname === '/' ? 'page' : undefined}
+					onclick={closeDrawer}
+				>Home</a>
+			</li>
 			{#each navLinks as link}
 				<li>
 					<a

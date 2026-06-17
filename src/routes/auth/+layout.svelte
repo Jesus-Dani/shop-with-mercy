@@ -11,7 +11,7 @@
 
 <style>
 	.auth-wrap {
-		min-height: calc(100dvh - var(--nav-height));
+		min-height: 100dvh;
 		display: flex;
 		align-items: center;
 		justify-content: center;

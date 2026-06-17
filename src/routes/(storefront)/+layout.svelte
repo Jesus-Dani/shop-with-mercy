@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Nav from '$components/Nav.svelte';
-	import Footer from '$components/Footer.svelte';
 	import CartDrawer from '$components/CartDrawer.svelte';
 	import type { LayoutData } from './$types';
 
@@ -17,5 +16,3 @@
 <main id="main-content" tabindex="-1">
 	{@render children()}
 </main>
-
-<Footer />

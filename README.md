@@ -1,6 +1,6 @@
 # Shop With Mercy
 
-A single-vendor e-commerce store for casual women's clothing, serving the Redeemer's University campus community (RUN) and off-campus customers in Nigeria.
+A single-vendor e-commerce store for casual women's clothing, serving customers across Nigeria.
 
 Built as a portfolio project — the full planning documentation is in [`/docs`](./docs/).
 
@@ -141,6 +141,14 @@ All six planning documents are in [`/docs`](./docs/). Read them in this order to
 4. [UI_UX_BRIEF](./docs/UI_UX_BRIEF.md) — design system
 5. [BACKEND_SCHEMA](./docs/BACKEND_SCHEMA.md) — database design
 6. [IMPLEMENTATION_PLAN](./docs/IMPLEMENTATION_PLAN.md) — build phases
+
+---
+
+## Testing as both admin and customer
+
+The admin area (`/admin`) and the storefront use the same browser session. There is deliberately no "dual login" — that would fight Supabase Auth and add complexity a single-owner shop doesn't need.
+
+**To preview the storefront as a customer while signed in as admin:** open a separate browser profile or an incognito/private window. That gives you a clean session without logging out of the admin.
 
 ---
 

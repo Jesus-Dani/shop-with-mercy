@@ -6,7 +6,7 @@ const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const;
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const [productRes, categoriesRes] = await Promise.all([
-		locals.supabase
+		locals.supabaseAdmin
 			.from('products')
 			.select(
 				'*, categories(id, name), product_colours(*, product_images(*), product_variants(*))'
@@ -52,7 +52,7 @@ export const actions: Actions = {
 		if (!price || price <= 0)
 			return fail(400, { action: 'updateProduct', error: 'Price must be greater than 0.' });
 
-		const { error: err } = await locals.supabase
+		const { error: err } = await locals.supabaseAdmin
 			.from('products')
 			.update({
 				name,
@@ -79,7 +79,7 @@ export const actions: Actions = {
 		if (!colourName)
 			return fail(400, { action: 'addColour', error: 'Colour name is required.' });
 
-		const { data: existing } = await locals.supabase
+		const { data: existing } = await locals.supabaseAdmin
 			.from('product_colours')
 			.select('sort_order')
 			.eq('product_id', params.id)
@@ -88,7 +88,7 @@ export const actions: Actions = {
 
 		const sortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
 
-		const { data: colour, error: colErr } = await locals.supabase
+		const { data: colour, error: colErr } = await locals.supabaseAdmin
 			.from('product_colours')
 			.insert({
 				product_id: params.id,
@@ -114,7 +114,7 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const colourId = String(form.get('colour_id') ?? '');
 
-		const { error: err } = await locals.supabase
+		const { error: err } = await locals.supabaseAdmin
 			.from('product_colours')
 			.delete()
 			.eq('id', colourId)
@@ -132,7 +132,7 @@ export const actions: Actions = {
 
 		if (!publicId) return fail(400, { action: 'addImage', error: 'No image provided.' });
 
-		const { data: existing } = await locals.supabase
+		const { data: existing } = await locals.supabaseAdmin
 			.from('product_images')
 			.select('sort_order')
 			.eq('product_colour_id', colourId)
@@ -141,7 +141,7 @@ export const actions: Actions = {
 
 		const sortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
 
-		const { error: err } = await locals.supabase
+		const { error: err } = await locals.supabaseAdmin
 			.from('product_images')
 			.insert({ product_colour_id: colourId, cloudinary_public_id: publicId, sort_order: sortOrder });
 
@@ -153,7 +153,7 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const imageId = String(form.get('image_id') ?? '');
 
-		const { error: err } = await locals.supabase
+		const { error: err } = await locals.supabaseAdmin
 			.from('product_images')
 			.delete()
 			.eq('id', imageId);
@@ -168,7 +168,7 @@ export const actions: Actions = {
 
 		const results = await Promise.all(
 			entries.map(([key, value]) =>
-				locals.supabase
+				locals.supabaseAdmin
 					.from('product_variants')
 					.update({
 						stock_quantity: Math.max(0, parseInt(String(value), 10) || 0),
@@ -185,7 +185,7 @@ export const actions: Actions = {
 	},
 
 	deleteProduct: async ({ locals, params }) => {
-		const { error: err } = await locals.supabase
+		const { error: err } = await locals.supabaseAdmin
 			.from('products')
 			.delete()
 			.eq('id', params.id);

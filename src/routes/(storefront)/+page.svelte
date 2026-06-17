@@ -131,38 +131,22 @@
 	.hero {
 		position: relative;
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		width: 100%;
-		min-height: 85dvh;
+		height: 70dvh;
 	}
 
 	.hero-panel {
 		position: relative;
 		overflow: hidden;
 		flex: 1;
-		min-height: 85dvh;
 		background: var(--color-black-forest);
-	}
-
-	/* Single image on mobile — cleaner focus */
-	.hero-panel:last-of-type {
-		display: none;
 	}
 
 	@media (min-width: 768px) {
 		.hero {
-			flex-direction: row;
 			height: 88dvh;
-			min-height: unset;
 			max-height: 880px;
-		}
-
-		.hero-panel {
-			min-height: unset;
-		}
-
-		.hero-panel:last-of-type {
-			display: block;
 		}
 	}
 

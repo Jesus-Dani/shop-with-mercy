@@ -14,8 +14,8 @@
 			<!-- Links column -->
 			<nav aria-label="Footer navigation">
 				<ul role="list" class="footer-links">
-					<li><a href="/category/tops">Tops</a></li>
-					<li><a href="/category/skirts">Skirts</a></li>
+					<li><a href="/shop?category=tops">Tops</a></li>
+					<li><a href="/shop?category=skirts">Skirts</a></li>
 					<li><a href="/refund-policy">Refund Policy</a></li>
 					<li><a href="/privacy">Privacy Policy</a></li>
 				</ul>

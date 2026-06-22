@@ -71,15 +71,15 @@
 		<div class="price-row">
 			<div class="field">
 				<label for="price">Selling price ₦ <span class="req">*</span></label>
-				<input id="price" name="price" type="number" min="1" step="0.01" class="input" placeholder="5000" required />
+				<input id="price" name="price" type="number" min="1" step="1" class="input" placeholder="5000" required />
 			</div>
 			<div class="field">
 				<label for="sale_price">Sale price ₦ <span class="hint">(optional)</span></label>
-				<input id="sale_price" name="sale_price" type="number" min="1" step="0.01" class="input" placeholder="4000" />
+				<input id="sale_price" name="sale_price" type="number" min="1" step="1" class="input" placeholder="4000" />
 			</div>
 			<div class="field">
 				<label for="cost_price">Cost price ₦ <span class="hint">(private)</span></label>
-				<input id="cost_price" name="cost_price" type="number" min="1" step="0.01" class="input" placeholder="2000" />
+				<input id="cost_price" name="cost_price" type="number" min="1" step="1" class="input" placeholder="2000" />
 			</div>
 		</div>
 	</div>

@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { cdnUrl } from '$lib/cloudinary';
+	import { formatNaira } from '$lib/format';
 	let { data }: { data: any } = $props();
-
-	function formatNaira(n: number) {
-		return '₦' + (n / 100).toLocaleString('en-NG', { minimumFractionDigits: 0 });
-	}
 
 	function primaryImage(product: (typeof data.products)[0]) {
 		const colours = product.product_colours as any[];

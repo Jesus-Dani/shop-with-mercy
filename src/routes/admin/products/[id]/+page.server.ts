@@ -41,11 +41,11 @@ export const actions: Actions = {
 		const name = String(form.get('name') ?? '').trim();
 		const description = String(form.get('description') ?? '').trim() || null;
 		const categoryId = String(form.get('category_id') ?? '').trim() || null;
-		const price = Math.round(parseFloat(String(form.get('price') ?? '0')) * 100);
+		const price = Math.round(parseFloat(String(form.get('price') ?? '0')));
 		const salePriceRaw = String(form.get('sale_price') ?? '').trim();
-		const salePrice = salePriceRaw ? Math.round(parseFloat(salePriceRaw) * 100) : null;
+		const salePrice = salePriceRaw ? Math.round(parseFloat(salePriceRaw)) : null;
 		const costPriceRaw = String(form.get('cost_price') ?? '').trim();
-		const costPrice = costPriceRaw ? Math.round(parseFloat(costPriceRaw) * 100) : null;
+		const costPrice = costPriceRaw ? Math.round(parseFloat(costPriceRaw)) : null;
 		const published = form.get('published') === 'on';
 
 		if (!name) return fail(400, { action: 'updateProduct', error: 'Name is required.' });

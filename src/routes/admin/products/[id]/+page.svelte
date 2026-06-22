@@ -10,10 +10,6 @@
 	const product = $derived(data.product as any);
 	const colours = $derived((product.product_colours ?? []) as any[]);
 
-	function formatPrice(kobo: number) {
-		return (kobo / 100).toFixed(2);
-	}
-
 	// ── Image upload state ──
 	let uploadingColourId = $state<string | null>(null);
 	let uploadError = $state<string | null>(null);
@@ -111,15 +107,15 @@
 		<div class="price-row">
 			<div class="field">
 				<label for="price">Selling price *</label>
-				<input id="price" name="price" type="number" min="1" step="0.01" class="input" value={formatPrice(product.price)} required />
+				<input id="price" name="price" type="number" min="1" step="1" class="input" value={product.price} required />
 			</div>
 			<div class="field">
 				<label for="sale_price">Sale price</label>
-				<input id="sale_price" name="sale_price" type="number" min="1" step="0.01" class="input" value={product.sale_price ? formatPrice(product.sale_price) : ''} />
+				<input id="sale_price" name="sale_price" type="number" min="1" step="1" class="input" value={product.sale_price ?? ''} />
 			</div>
 			<div class="field">
 				<label for="cost_price">Cost price <span class="hint">(private)</span></label>
-				<input id="cost_price" name="cost_price" type="number" min="1" step="0.01" class="input" value={product.cost_price ? formatPrice(product.cost_price) : ''} />
+				<input id="cost_price" name="cost_price" type="number" min="1" step="1" class="input" value={product.cost_price ?? ''} />
 			</div>
 		</div>
 	</div>

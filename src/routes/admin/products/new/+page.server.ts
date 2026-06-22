@@ -61,6 +61,6 @@ export const actions: Actions = {
 		}
 
 		logAudit(locals.supabaseAdmin, 'product.create', 'products', product.id, { new: { name, price } });
-		throw redirect(303, '/admin/products');
+		throw redirect(303, `/admin/products/${product.id}`);
 	}
 };

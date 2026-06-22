@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { applyAction, deserialize } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, goto } from '$app/navigation';
 	import { cdnUrl, uploadToCloudinary } from '$lib/cloudinary';
 	import type { ActionData } from './$types';
 
@@ -44,9 +44,10 @@
 	type Tab = 'details' | 'colours' | 'stock';
 	let activeTab = $state<Tab>('details');
 
-	// ── Update product feedback ──
-	const savedDetails = $derived((form as any)?.action === 'updateProduct' && (form as any)?.success);
-	const savedStock = $derived((form as any)?.action === 'updateStock' && (form as any)?.success);
+	let detailsSaving = $state(false);
+	let detailsError = $state<string | null>(null);
+	let stockSaving = $state(false);
+	let stockError = $state<string | null>(null);
 </script>
 
 <svelte:head><title>{product.name} — SWM Admin</title></svelte:head>
@@ -63,23 +64,46 @@
 	</form>
 </div>
 
-<!-- Tabs -->
+<!-- Step indicator -->
 <div class="tab-bar">
-	{#each (['details', 'colours', 'stock'] as Tab[]) as tab}
-		<button class="tab-btn" class:active={activeTab === tab} onclick={() => (activeTab = tab)}>
-			{tab === 'details' ? 'Details' : tab === 'colours' ? `Colours & Images (${colours.length})` : 'Stock'}
+	{#each (['details', 'colours', 'stock'] as Tab[]) as tab, i}
+		<button
+			class="tab-btn"
+			class:active={activeTab === tab}
+			class:completed={
+				(tab === 'details' && (activeTab === 'colours' || activeTab === 'stock')) ||
+				(tab === 'colours' && activeTab === 'stock')
+			}
+			onclick={() => (activeTab = tab)}
+		>
+			<span class="tab-num">{i + 1}</span>
+			{tab === 'details' ? 'Details' : tab === 'colours' ? 'Colours & Images' : 'Stock'}
 		</button>
 	{/each}
 </div>
 
 <!-- ── DETAILS TAB ── -->
 {#if activeTab === 'details'}
-<form method="POST" action="?/updateProduct" class="product-form" use:enhance>
-	{#if (form as any)?.action === 'updateProduct' && (form as any)?.error}
-		<p class="alert-error" role="alert">{(form as any).error}</p>
-	{/if}
-	{#if savedDetails}
-		<p class="alert-success" role="status">Details saved.</p>
+<form
+	method="POST"
+	action="?/updateProduct"
+	class="product-form"
+	use:enhance={() => {
+		detailsSaving = true;
+		detailsError = null;
+		return async ({ result }) => {
+			detailsSaving = false;
+			if (result.type === 'success') {
+				await invalidateAll();
+				activeTab = 'colours';
+			} else if (result.type === 'failure') {
+				detailsError = (result.data as any)?.error ?? 'Could not save details.';
+			}
+		};
+	}}
+>
+	{#if detailsError}
+		<p class="alert-error" role="alert">{detailsError}</p>
 	{/if}
 
 	<div class="form-section">
@@ -128,7 +152,9 @@
 		</label>
 	</div>
 
-	<button type="submit" class="btn btn-primary">Save details</button>
+	<button type="submit" class="btn btn-primary btn-next" disabled={detailsSaving}>
+		{detailsSaving ? 'Saving…' : 'Next: Colours & Images →'}
+	</button>
 </form>
 {/if}
 
@@ -205,23 +231,40 @@
 			<button type="submit" class="btn btn-primary">Add colour</button>
 		</form>
 	</div>
+
+	<button type="button" class="btn btn-primary btn-next" onclick={() => (activeTab = 'stock')}>
+		Next: Stock →
+	</button>
 </div>
 {/if}
 
 <!-- ── STOCK TAB ── -->
 {#if activeTab === 'stock'}
 <div class="stock-section">
-	{#if (form as any)?.action === 'updateStock' && (form as any)?.error}
-		<p class="alert-error" role="alert">{(form as any).error}</p>
-	{/if}
-	{#if savedStock}
-		<p class="alert-success" role="status">Stock updated.</p>
+	{#if stockError}
+		<p class="alert-error" role="alert">{stockError}</p>
 	{/if}
 
 	{#if colours.length === 0}
 		<p class="empty-note">Add colours first, then set stock quantities here.</p>
+		<button type="button" class="btn btn-outline" onclick={() => (activeTab = 'colours')}>← Back to Colours</button>
 	{:else}
-		<form method="POST" action="?/updateStock" use:enhance>
+		<form
+			method="POST"
+			action="?/updateStock"
+			use:enhance={() => {
+				stockSaving = true;
+				stockError = null;
+				return async ({ result }) => {
+					stockSaving = false;
+					if (result.type === 'success') {
+						await goto('/admin/products');
+					} else if (result.type === 'failure') {
+						stockError = (result.data as any)?.error ?? 'Could not save stock.';
+					}
+				};
+			}}
+		>
 			<div class="stock-table-wrap">
 				<table class="stock-table">
 					<thead>
@@ -260,7 +303,9 @@
 					</tbody>
 				</table>
 			</div>
-			<button type="submit" class="btn btn-primary" style="margin-top: var(--space-lg)">Save stock</button>
+			<button type="submit" class="btn btn-primary btn-next" disabled={stockSaving}>
+				{stockSaving ? 'Saving…' : 'Save & finish ✓'}
+			</button>
 		</form>
 	{/if}
 </div>
@@ -298,7 +343,7 @@
 	}
 	.btn-danger:hover { background: rgba(188, 108, 37, 0.08); }
 
-	/* Tabs */
+	/* Tabs / steps */
 	.tab-bar {
 		display: flex;
 		border-bottom: 1px solid var(--border-color);
@@ -320,10 +365,46 @@
 		white-space: nowrap;
 		min-height: 44px;
 		margin-bottom: -1px;
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
 		transition: color var(--transition-fast), border-color var(--transition-fast);
 	}
 	.tab-btn:hover { color: var(--text-primary); }
 	.tab-btn.active { color: var(--text-primary); border-bottom-color: var(--color-black-forest); }
+	.tab-btn.completed { color: var(--color-olive-leaf); }
+
+	.tab-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		font-size: 11px;
+		font-weight: 700;
+		border: 1.5px solid var(--border-color);
+		color: var(--text-secondary);
+		flex-shrink: 0;
+	}
+
+	.tab-btn.active .tab-num {
+		background: var(--color-black-forest);
+		color: var(--color-cornsilk);
+		border-color: var(--color-black-forest);
+	}
+
+	.tab-btn.completed .tab-num {
+		background: var(--color-olive-leaf);
+		color: white;
+		border-color: var(--color-olive-leaf);
+	}
+
+	/* Next button */
+	.btn-next {
+		margin-top: var(--space-lg);
+		align-self: flex-start;
+	}
 
 	/* Details form */
 	.product-form { display: flex; flex-direction: column; gap: var(--space-lg); max-width: 640px; }
@@ -363,11 +444,6 @@
 	.alert-error {
 		background: rgba(188, 108, 37, 0.10); color: var(--color-copperwood);
 		border: 1px solid rgba(188, 108, 37, 0.30); border-radius: var(--radius-sm);
-		padding: var(--space-sm) var(--space-md); font-size: var(--text-small); max-width: none;
-	}
-	.alert-success {
-		background: rgba(96, 108, 56, 0.10); color: var(--color-olive-leaf);
-		border: 1px solid rgba(96, 108, 56, 0.30); border-radius: var(--radius-sm);
 		padding: var(--space-sm) var(--space-md); font-size: var(--text-small); max-width: none;
 	}
 
@@ -460,7 +536,7 @@
 
 	/* Stock */
 	.stock-section { display: flex; flex-direction: column; gap: var(--space-md); }
-	.empty-note { color: var(--text-secondary); font-size: var(--text-small); }
+	.empty-note { color: var(--text-secondary); font-size: var(--text-small); max-width: none; }
 
 	.stock-table-wrap { overflow-x: auto; }
 

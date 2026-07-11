@@ -181,10 +181,18 @@
 						<span class="colour-swatch pattern-swatch" aria-label="Pattern"></span>
 					{/if}
 					<strong class="colour-name">{colour.colour_name}</strong>
-					<form method="POST" action="?/deleteColour" use:enhance onsubmit={(e) => { if (!confirm(`Delete "${colour.colour_name}" and all its images?`)) e.preventDefault(); }}>
-						<input type="hidden" name="colour_id" value={colour.id} />
-						<button type="submit" class="btn-link danger">Remove colour</button>
-					</form>
+					<div class="colour-actions">
+						{#if colour.colour_hex}
+							<form method="POST" action="?/clearColourHex" use:enhance>
+								<input type="hidden" name="colour_id" value={colour.id} />
+								<button type="submit" class="btn-link">Remove dot (make pattern)</button>
+							</form>
+						{/if}
+						<form method="POST" action="?/deleteColour" use:enhance onsubmit={(e) => { if (!confirm(`Delete "${colour.colour_name}" and all its images?`)) e.preventDefault(); }}>
+							<input type="hidden" name="colour_id" value={colour.id} />
+							<button type="submit" class="btn-link danger">Remove colour</button>
+						</form>
+					</div>
 				</div>
 
 				<!-- Images -->
@@ -225,7 +233,7 @@
 	<!-- Add colour form -->
 	<div class="add-colour-card">
 		<h3 class="section-title">Add a colour / pattern</h3>
-		<form method="POST" action="?/addColour" class="add-colour-form" use:enhance onsubmit={() => { isPattern = false; }}>
+		<form method="POST" action="?/addColour" class="add-colour-form" use:enhance>
 			<div class="field">
 				<label for="colour_name">Name</label>
 				<input id="colour_name" name="colour_name" type="text" class="input" placeholder="e.g. Dusty Rose, Floral Print, Tie-Dye" required />
@@ -501,6 +509,7 @@
 		);
 	}
 	.colour-name { font-size: var(--text-small); font-weight: 600; flex: 1; }
+	.colour-actions { display: flex; gap: var(--space-sm); align-items: center; flex-wrap: wrap; }
 
 	.btn-link {
 		font-size: var(--text-micro); font-weight: 500; background: none; border: none;

@@ -126,6 +126,20 @@ export const actions: Actions = {
 		return { action: 'deleteColour', success: true };
 	},
 
+	clearColourHex: async ({ request, locals, params }) => {
+		const form = await request.formData();
+		const colourId = String(form.get('colour_id') ?? '');
+
+		const { error: err } = await locals.supabaseAdmin
+			.from('product_colours')
+			.update({ colour_hex: null })
+			.eq('id', colourId)
+			.eq('product_id', params.id);
+
+		if (err) return fail(500, { action: 'clearColourHex', error: err.message });
+		return { action: 'clearColourHex', success: true };
+	},
+
 	addImage: async ({ request, locals }) => {
 		const form = await request.formData();
 		const colourId = String(form.get('colour_id') ?? '');

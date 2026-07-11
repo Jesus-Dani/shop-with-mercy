@@ -213,6 +213,8 @@
 							<button
 								type="button"
 								class="swatch"
+								class:swatch-dot={!!c.hex}
+								class:swatch-label={!c.hex}
 								class:swatch-active={selectedColourIdx === i}
 								aria-label="Select colour {c.name}"
 								aria-pressed={selectedColourIdx === i}
@@ -588,16 +590,21 @@
 	}
 
 	.swatch {
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
 		border: 2px solid transparent;
-		padding: 2px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition: border-color var(--transition-fast), transform var(--transition-fast);
+		background: none;
+	}
+
+	/* Colour dot variant */
+	.swatch.swatch-dot {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		padding: 2px;
 	}
 
 	.swatch-circle {
@@ -608,15 +615,32 @@
 		border: 1px solid rgba(0, 0, 0, 0.1);
 	}
 
-	.swatch-text {
-		font-size: var(--text-micro);
-		font-weight: 600;
-		white-space: nowrap;
-		padding: 4px 8px;
+	/* Pattern / text label variant */
+	.swatch.swatch-label {
+		height: 36px;
+		border-radius: var(--radius-sm);
+		padding: 0 var(--space-sm);
+		border-color: var(--border-color);
 	}
 
-	.swatch-active {
+	.swatch-text {
+		font-size: var(--text-small);
+		font-weight: 500;
+		white-space: nowrap;
+		color: var(--text-primary);
+	}
+
+	.swatch-active.swatch-dot {
 		border-color: var(--color-copperwood);
+	}
+
+	.swatch-active.swatch-label {
+		border-color: var(--color-copperwood);
+		color: var(--color-copperwood);
+	}
+
+	.swatch-active.swatch-label .swatch-text {
+		color: var(--color-copperwood);
 	}
 
 	.swatch:focus-visible {

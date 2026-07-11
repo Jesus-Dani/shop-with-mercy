@@ -48,6 +48,8 @@
 	let detailsError = $state<string | null>(null);
 	let stockSaving = $state(false);
 	let stockError = $state<string | null>(null);
+
+	let isPattern = $state(false);
 </script>
 
 <svelte:head><title>{product.name} — SWM Admin</title></svelte:head>
@@ -173,7 +175,11 @@
 		{#each colours as colour}
 			<div class="colour-card">
 				<div class="colour-head">
-					<span class="colour-swatch" style="background: {colour.colour_hex ?? '#ccc'}"></span>
+					{#if colour.colour_hex}
+						<span class="colour-swatch" style="background: {colour.colour_hex}"></span>
+					{:else}
+						<span class="colour-swatch pattern-swatch" aria-label="Pattern"></span>
+					{/if}
 					<strong class="colour-name">{colour.colour_name}</strong>
 					<form method="POST" action="?/deleteColour" use:enhance onsubmit={(e) => { if (!confirm(`Delete "${colour.colour_name}" and all its images?`)) e.preventDefault(); }}>
 						<input type="hidden" name="colour_id" value={colour.id} />
@@ -218,17 +224,26 @@
 
 	<!-- Add colour form -->
 	<div class="add-colour-card">
-		<h3 class="section-title">Add a colour</h3>
-		<form method="POST" action="?/addColour" class="add-colour-form" use:enhance>
+		<h3 class="section-title">Add a colour / pattern</h3>
+		<form method="POST" action="?/addColour" class="add-colour-form" use:enhance onsubmit={() => { isPattern = false; }}>
 			<div class="field">
-				<label for="colour_name">Colour name</label>
-				<input id="colour_name" name="colour_name" type="text" class="input" placeholder="e.g. Dusty Rose" required />
+				<label for="colour_name">Name</label>
+				<input id="colour_name" name="colour_name" type="text" class="input" placeholder="e.g. Dusty Rose, Floral Print, Tie-Dye" required />
 			</div>
-			<div class="field">
-				<label for="colour_hex">Colour swatch</label>
-				<input id="colour_hex" name="colour_hex" type="color" class="colour-picker" value="#b08080" />
-			</div>
-			<button type="submit" class="btn btn-primary">Add colour</button>
+
+			<label class="pattern-check-label">
+				<input type="checkbox" bind:checked={isPattern} />
+				Pattern / print (no colour swatch)
+			</label>
+
+			{#if !isPattern}
+				<div class="field">
+					<label for="colour_hex">Colour swatch</label>
+					<input id="colour_hex" name="colour_hex" type="color" class="colour-picker" value="#b08080" />
+				</div>
+			{/if}
+
+			<button type="submit" class="btn btn-primary">Add</button>
 		</form>
 	</div>
 
@@ -272,7 +287,9 @@
 							<th>Size</th>
 							{#each colours as colour}
 								<th>
-									<span class="colour-swatch-sm" style="background:{colour.colour_hex ?? '#ccc'}"></span>
+									{#if colour.colour_hex}
+										<span class="colour-swatch-sm" style="background:{colour.colour_hex}"></span>
+									{/if}
 									{colour.colour_name}
 								</th>
 							{/each}
@@ -474,6 +491,15 @@
 		width: 20px; height: 20px; border-radius: 50%;
 		border: 1px solid rgba(0,0,0,0.15); flex-shrink: 0;
 	}
+	.pattern-swatch {
+		background: repeating-linear-gradient(
+			45deg,
+			var(--border-color) 0px,
+			var(--border-color) 3px,
+			transparent 3px,
+			transparent 8px
+		);
+	}
 	.colour-name { font-size: var(--text-small); font-weight: 600; flex: 1; }
 
 	.btn-link {
@@ -524,8 +550,14 @@
 		display: flex; flex-direction: column; gap: var(--space-md);
 	}
 
+	.pattern-check-label {
+		display: flex; align-items: center; gap: var(--space-xs);
+		font-size: var(--text-small); color: var(--text-secondary); cursor: pointer;
+	}
+	.pattern-check-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+
 	.add-colour-form {
-		display: flex; flex-wrap: wrap; gap: var(--space-md); align-items: flex-end;
+		display: flex; flex-direction: column; gap: var(--space-md);
 	}
 	.add-colour-form .field { min-width: 160px; }
 	.colour-picker {

@@ -37,6 +37,8 @@ type ReviewRow = { id: string; rating: number; body: string | null; created_at: 
 type QueryResult<T> = { data: T | null; error: { message: string } | null };
 
 export const load: PageServerLoad = async ({ locals, params }) => {
+	const session = await locals.safeGetSession();
+
 	const [productResult, reviewsResult] = (await Promise.all([
 		locals.supabase
 			.from('products')
@@ -86,6 +88,19 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
 			: null;
 
+	let wishlistedVariantIds: string[] = [];
+	if (session?.user) {
+		const variantIds = colours.flatMap((c) => c.variants.map((v) => v.id));
+		if (variantIds.length > 0) {
+			const { data: wl } = await locals.supabase
+				.from('wishlist_items')
+				.select('product_variant_id')
+				.eq('user_id', session.user.id)
+				.in('product_variant_id', variantIds);
+			wishlistedVariantIds = (wl ?? []).map((r: any) => r.product_variant_id);
+		}
+	}
+
 	return {
 		product: {
 			id: raw.id,
@@ -98,6 +113,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		colours,
 		reviews,
 		avgRating,
-		reviewCount: reviews.length
+		reviewCount: reviews.length,
+		wishlistedVariantIds,
+		user: session?.user ? { id: session.user.id } : null
 	};
 };

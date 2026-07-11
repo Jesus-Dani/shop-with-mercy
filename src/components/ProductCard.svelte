@@ -23,15 +23,7 @@
 	const isSoldOut = $derived(totalStock <= 0);
 	const isOnSale = $derived(salePrice !== null && salePrice < price);
 
-	let wishlistFeedback = $state(false);
 
-	function handleWishlist(e: MouseEvent) {
-		e.preventDefault();
-		wishlistFeedback = true;
-		setTimeout(() => {
-			wishlistFeedback = false;
-		}, 2000);
-	}
 </script>
 
 <article class="card">
@@ -62,22 +54,16 @@
 			<span class="badge badge-sale card-badge">Sale</span>
 		{/if}
 
-		<button
+		<a
+			href="/shop/{id}"
 			class="wishlist-btn"
 			aria-label="Save {name} to wishlist"
-			type="button"
-			onclick={handleWishlist}
+			tabindex="0"
 		>
-			{#if wishlistFeedback}
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-				</svg>
-			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-				</svg>
-			{/if}
-		</button>
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+			</svg>
+		</a>
 	</div>
 
 	<div class="card-body">

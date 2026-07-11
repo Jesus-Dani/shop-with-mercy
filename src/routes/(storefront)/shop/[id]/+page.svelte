@@ -13,6 +13,30 @@
 	let selectedSize = $state<string | null>(null);
 	let addedFeedback = $state(false);
 
+	let wishlistedIds = $state<Set<string>>(new Set(data.wishlistedVariantIds ?? []));
+	let wishlistLoading = $state(false);
+
+	const isWishlisted = $derived(variant ? wishlistedIds.has(variant.id) : false);
+
+	async function handleWishlist() {
+		if (!variant) return;
+		if (!data.user) { window.location.href = '/auth/sign-in'; return; }
+		wishlistLoading = true;
+		try {
+			const res = await fetch('/api/wishlist', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ variant_id: variant.id })
+			});
+			const json = await res.json();
+			if (json.action === 'added') wishlistedIds.add(variant.id);
+			else wishlistedIds.delete(variant.id);
+			wishlistedIds = new Set(wishlistedIds);
+		} finally {
+			wishlistLoading = false;
+		}
+	}
+
 	const colour = $derived(data.colours[selectedColourIdx]);
 	const currentImage = $derived(colour?.images[selectedImageIdx] ?? null);
 	const variant = $derived(
@@ -263,12 +287,18 @@
 					{/if}
 				</button>
 
-				<!-- Wishlist (Phase 5) -->
-				<button type="button" class="btn btn-outline wishlist-btn" aria-label="Save to wishlist">
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<button
+					type="button"
+					class="btn btn-outline wishlist-btn"
+					class:wishlisted={isWishlisted}
+					aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+					disabled={!selectedSize || wishlistLoading}
+					onclick={handleWishlist}
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill={isWishlisted ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
 					</svg>
-					Wishlist
+					{isWishlisted ? 'Saved' : !selectedSize ? 'Select size first' : 'Wishlist'}
 				</button>
 			</div>
 
@@ -661,6 +691,11 @@
 
 	.wishlist-btn {
 		width: 100%;
+	}
+
+	.wishlist-btn.wishlisted {
+		color: var(--color-copperwood);
+		border-color: var(--color-copperwood);
 	}
 
 	/* WhatsApp link */

@@ -74,7 +74,8 @@ export const actions: Actions = {
 	addColour: async ({ request, locals, params }) => {
 		const form = await request.formData();
 		const colourName = String(form.get('colour_name') ?? '').trim();
-		const colourHex = String(form.get('colour_hex') ?? '#6b6b6b');
+		const rawHex = form.get('colour_hex');
+		const colourHex = rawHex ? String(rawHex) : null;
 
 		if (!colourName)
 			return fail(400, { action: 'addColour', error: 'Colour name is required.' });

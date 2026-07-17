@@ -250,14 +250,14 @@
 							</div>
 
 							<div class="field">
-								<label for="ref">Transaction reference</label>
+								<label for="ref">Transaction Number / Session ID</label>
 								<input
 									id="ref"
 									type="text"
 									class="input"
-									placeholder="From your Opay transfer receipt"
 									bind:value={paymentRef}
 								/>
+								<em class="field-hint">Check your bank app or SMS receipt — it's usually labelled "Transaction ID", "Session ID", or "Reference".</em>
 							</div>
 
 							<div class="field">
@@ -320,7 +320,7 @@
 					{#if !canProceed && !submitting}
 						<p class="proceed-hint">
 							{#if !phone.trim() || !paymentRef.trim() || !receiptPublicId}
-								Fill in your phone number, payment reference, and upload your receipt to proceed.
+								Fill in your phone number, transaction number, and upload your receipt to proceed.
 							{/if}
 						</p>
 					{/if}
@@ -679,6 +679,13 @@
 		font-size: var(--text-small);
 		font-weight: 500;
 		color: var(--text-secondary);
+	}
+
+	.field-hint {
+		font-size: var(--text-micro);
+		color: var(--text-secondary);
+		display: block;
+		margin-top: 4px;
 	}
 
 	.field-error {

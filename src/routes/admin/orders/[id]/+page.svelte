@@ -114,7 +114,7 @@
 							<tr>
 								<td>
 									{#if productId}
-										<a href="/admin/products/{productId}" class="product-link">{item.product_name}</a>
+										<a href="/shop/{productId}" target="_blank" rel="noopener noreferrer" class="product-link">{item.product_name}</a>
 									{:else}
 										{item.product_name}
 									{/if}

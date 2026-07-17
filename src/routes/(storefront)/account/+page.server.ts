@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const meta = session.user.user_metadata ?? {};
 	const fullName = ((meta.full_name ?? meta.name ?? '') as string);
 
-	const { data: ordersRaw } = await locals.supabase
+	const { data: ordersRaw } = await locals.supabaseAdmin
 		.from('orders')
 		.select(`
 			id,

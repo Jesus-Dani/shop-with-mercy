@@ -1,21 +1,111 @@
 <script lang="ts">
 	import { cart } from '$lib/cart.svelte';
-	import { cdnUrl } from '$lib/cloudinary';
+	import { cdnUrl, uploadToCloudinary } from '$lib/cloudinary';
 	import { formatNaira } from '$lib/format';
 	import { track } from '$lib/track';
+	import { env } from '$env/dynamic/public';
 
-	const whatsappMsg = $derived(
-		cart.items.length === 0
-			? ''
-			: encodeURIComponent(
-					`Hi! I'd like to order:\n${cart.items
-						.map(
-							(i) =>
-								`• ${i.name} (${i.colourName}, Size ${i.size}) x${i.quantity} — ${formatNaira(i.price * i.quantity)}`
-						)
-						.join('\n')}\n\nTotal: ${formatNaira(cart.total)}`
-				)
+	let { data } = $props<{ data: { user: { full_name: string } | null } }>();
+
+	const ACCOUNT_NUMBER = '9049435149';
+	const WHATSAPP = '2349049435149';
+
+	// Payment form state
+	let phone = $state('');
+	let paymentRef = $state('');
+	let receiptPublicId = $state<string | null>(null);
+	let receiptPreviewUrl = $state<string | null>(null);
+	let uploading = $state(false);
+	let uploadError = $state<string | null>(null);
+	let submitting = $state(false);
+	let orderError = $state<string | null>(null);
+	let copied = $state(false);
+
+	const canProceed = $derived(
+		!!data.user &&
+		phone.trim().length >= 7 &&
+		paymentRef.trim().length > 0 &&
+		receiptPublicId !== null &&
+		!submitting &&
+		cart.items.length > 0
 	);
+
+	function copyAccount() {
+		navigator.clipboard.writeText(ACCOUNT_NUMBER).then(() => {
+			copied = true;
+			setTimeout(() => (copied = false), 2000);
+		});
+	}
+
+	async function handleReceiptUpload(e: Event) {
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (!file) return;
+		uploading = true;
+		uploadError = null;
+		try {
+			const publicId = await uploadToCloudinary(file, 'shop-with-mercy');
+			if (receiptPreviewUrl) URL.revokeObjectURL(receiptPreviewUrl);
+			receiptPublicId = publicId;
+			receiptPreviewUrl = URL.createObjectURL(file);
+		} catch {
+			uploadError = 'Upload failed. Please try again.';
+		} finally {
+			uploading = false;
+		}
+	}
+
+	function clearReceipt() {
+		if (receiptPreviewUrl) URL.revokeObjectURL(receiptPreviewUrl);
+		receiptPublicId = null;
+		receiptPreviewUrl = null;
+	}
+
+	async function handleCheckout() {
+		if (!canProceed) return;
+		submitting = true;
+		orderError = null;
+
+		// Snapshot before clearing
+		const snapshot = [...cart.items];
+		const total = cart.total;
+
+		try {
+			const res = await fetch('/api/orders', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					items: snapshot,
+					subtotal: total,
+					paymentRef: paymentRef.trim(),
+					receiptPublicId,
+					phone: phone.trim()
+				})
+			});
+			const json = await res.json();
+			if (!res.ok) throw new Error(json.message ?? 'Could not place order');
+
+			const itemsList = snapshot
+				.map(
+					(i) =>
+						`• ${i.name} (${i.colourName}, Size ${i.size}) x${i.quantity} — ${formatNaira(i.price * i.quantity)}`
+				)
+				.join('\n');
+
+			const receiptUrl = `https://res.cloudinary.com/${env.PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${receiptPublicId}`;
+
+			const msg = encodeURIComponent(
+				`Hi! My name is ${data.user!.full_name}. I just placed an order:\n\n${itemsList}\n\nTotal: ${formatNaira(total)}\nPayment ref: ${paymentRef.trim()}\nPhone: ${phone.trim()}\nReceipt: ${receiptUrl}\nOrder: ${json.orderNumber}`
+			);
+
+			cart.clear();
+			track('order_placed', { meta: { total, item_count: snapshot.length } });
+
+			window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank', 'noopener,noreferrer');
+		} catch (err) {
+			orderError = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+			submitting = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -80,7 +170,7 @@
 				{/each}
 			</ul>
 
-			<!-- Order summary -->
+			<!-- Order summary + payment -->
 			<aside class="summary">
 				<h2 class="summary-title">Order Summary</h2>
 
@@ -91,7 +181,7 @@
 					</div>
 					<div class="summary-row">
 						<span>Delivery</span>
-						<span class="delivery-note">Calculated on checkout</span>
+						<span class="delivery-note">Discussed on WhatsApp</span>
 					</div>
 				</div>
 
@@ -100,23 +190,140 @@
 					<span class="total-val">{formatNaira(cart.total)}</span>
 				</div>
 
-				<a
-					href="https://wa.me/2349049435149?text={whatsappMsg}"
-					class="btn btn-primary checkout-btn"
-					target="_blank"
-					rel="noopener noreferrer"
-					onclick={() => track('checkout_started', { meta: { total: cart.total, item_count: cart.count } })}
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-						<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
-						<path d="M11 12l1 1l2 -2" />
-					</svg>
-					Order via WhatsApp
-				</a>
+				<!-- ── PAYMENT ── -->
+				{#if !data.user}
+					<div class="auth-gate">
+						<p>Sign in to complete your order.</p>
+						<a href="/auth/sign-in?next=/cart" class="btn btn-primary">Sign in to order</a>
+					</div>
+				{:else}
+					<div class="payment-section">
 
-				<p class="checkout-note">Online card payment coming soon via Paystack</p>
+						<!-- Step 1: bank details -->
+						<div class="pay-step">
+							<p class="step-label">
+								<span class="step-num">1</span>
+								Transfer to this account
+							</p>
+							<div class="bank-card">
+								<div class="bank-row">
+									<span class="bk">Account</span>
+									<span class="bv mono">{ACCOUNT_NUMBER}</span>
+									<button type="button" class="copy-btn" onclick={copyAccount}>
+										{copied ? '✓ Copied' : 'Copy'}
+									</button>
+								</div>
+								<div class="bank-row">
+									<span class="bk">Bank</span>
+									<span class="bv">Opay</span>
+								</div>
+								<div class="bank-row">
+									<span class="bk">Name</span>
+									<span class="bv">Olufe Anuoluwapo Asepeoluwa</span>
+								</div>
+								<div class="bank-row amount-row">
+									<span class="bk">Amount</span>
+									<span class="bv amount">{formatNaira(cart.total)}</span>
+								</div>
+							</div>
+						</div>
 
-				<a href="/shop" class="btn btn-outline">Continue Shopping</a>
+						<!-- Step 2: proof of payment -->
+						<div class="pay-step">
+							<p class="step-label">
+								<span class="step-num">2</span>
+								Send proof of payment
+							</p>
+
+							<div class="field">
+								<label for="phone">Your phone number</label>
+								<input
+									id="phone"
+									type="tel"
+									class="input"
+									placeholder="e.g. 08012345678"
+									bind:value={phone}
+								/>
+							</div>
+
+							<div class="field">
+								<label for="ref">Transaction reference</label>
+								<input
+									id="ref"
+									type="text"
+									class="input"
+									placeholder="From your Opay transfer receipt"
+									bind:value={paymentRef}
+								/>
+							</div>
+
+							<div class="field">
+								<label>Receipt screenshot</label>
+								{#if receiptPublicId && receiptPreviewUrl}
+									<div class="receipt-preview-wrap">
+										<img
+											src={receiptPreviewUrl}
+											alt="Payment receipt"
+											class="receipt-preview"
+										/>
+										<button type="button" class="btn-link" onclick={clearReceipt}>
+											Change photo
+										</button>
+									</div>
+								{:else}
+									<label class="upload-label" class:uploading>
+										{#if uploading}
+											<span class="upload-spinner" aria-hidden="true"></span>
+											Uploading…
+										{:else}
+											<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+												<path d="M12 5v14M5 12l7-7 7 7"/>
+											</svg>
+											Upload screenshot
+										{/if}
+										<input
+											type="file"
+											accept="image/*"
+											style="display:none"
+											disabled={uploading}
+											onchange={handleReceiptUpload}
+										/>
+									</label>
+								{/if}
+								{#if uploadError}
+									<p class="field-error">{uploadError}</p>
+								{/if}
+							</div>
+						</div>
+					</div>
+
+					{#if orderError}
+						<p class="alert-error" role="alert">{orderError}</p>
+					{/if}
+
+					<button
+						type="button"
+						class="btn btn-primary checkout-btn"
+						disabled={!canProceed}
+						onclick={handleCheckout}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+							<path d="M11 12l1 1l2 -2" />
+						</svg>
+						{submitting ? 'Placing order…' : 'Proceed to WhatsApp →'}
+					</button>
+
+					{#if !canProceed && !submitting}
+						<p class="proceed-hint">
+							{#if !phone.trim() || !paymentRef.trim() || !receiptPublicId}
+								Fill in your phone number, payment reference, and upload your receipt to proceed.
+							{/if}
+						</p>
+					{/if}
+				{/if}
+
+				<a href="/shop" class="btn btn-outline continue-btn">Continue Shopping</a>
 			</aside>
 		</div>
 	{/if}
@@ -152,7 +359,7 @@
 
 	@media (min-width: 768px) {
 		.cart-layout {
-			grid-template-columns: 1fr 360px;
+			grid-template-columns: 1fr 380px;
 		}
 	}
 
@@ -252,11 +459,7 @@
 	}
 
 	.remove-btn:hover { color: var(--color-copperwood); }
-
-	.remove-btn:focus-visible {
-		outline: 2px solid var(--focus-ring);
-		outline-offset: 2px;
-	}
+	.remove-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 	.item-bottom {
 		display: flex;
@@ -288,11 +491,7 @@
 	}
 
 	.qty-btn:hover { background: var(--bg-card); }
-
-	.qty-btn:focus-visible {
-		outline: 2px solid var(--focus-ring);
-		outline-offset: -2px;
-	}
+	.qty-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
 
 	.qty-val {
 		min-width: 36px;
@@ -312,7 +511,7 @@
 		max-width: none;
 	}
 
-	/* Summary */
+	/* Summary sidebar */
 	.summary {
 		background: var(--bg-card);
 		border-radius: var(--radius-md);
@@ -342,9 +541,7 @@
 		color: var(--text-secondary);
 	}
 
-	.delivery-note {
-		font-style: italic;
-	}
+	.delivery-note { font-style: italic; }
 
 	.summary-total {
 		display: flex;
@@ -357,19 +554,224 @@
 		color: var(--text-primary);
 	}
 
-	.total-val {
-		font-size: var(--text-h2);
+	.total-val { font-size: var(--text-h2); }
+
+	/* Auth gate */
+	.auth-gate {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+		padding: var(--space-md);
+		background: var(--bg-page);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--border-color);
 	}
 
+	.auth-gate p {
+		font-size: var(--text-small);
+		color: var(--text-secondary);
+		max-width: none;
+	}
+
+	/* Payment section */
+	.payment-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-lg);
+		border-top: 1px solid var(--border-color);
+		padding-top: var(--space-md);
+	}
+
+	.pay-step {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+	}
+
+	.step-label {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		font-size: var(--text-small);
+		font-weight: 600;
+		color: var(--text-primary);
+		max-width: none;
+	}
+
+	.step-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		background: var(--color-black-forest);
+		color: var(--color-cornsilk);
+		font-size: 11px;
+		font-weight: 700;
+		flex-shrink: 0;
+	}
+
+	/* Bank details card */
+	.bank-card {
+		background: var(--bg-page);
+		border: 1px solid var(--border-color);
+		border-radius: var(--radius-sm);
+		padding: var(--space-md);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+	}
+
+	.bank-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		font-size: var(--text-small);
+	}
+
+	.bk {
+		width: 64px;
+		flex-shrink: 0;
+		color: var(--text-secondary);
+		font-size: var(--text-micro);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.bv {
+		flex: 1;
+		color: var(--text-primary);
+		font-weight: 500;
+	}
+
+	.mono { font-family: monospace; letter-spacing: 0.06em; font-size: var(--text-body); }
+
+	.amount-row { padding-top: var(--space-sm); border-top: 1px solid var(--border-color); }
+	.amount { font-size: var(--text-h3); font-weight: 700; color: var(--color-copperwood); }
+
+	.copy-btn {
+		flex-shrink: 0;
+		font-size: var(--text-micro);
+		font-weight: 600;
+		padding: 4px 10px;
+		border: 1px solid var(--border-color);
+		border-radius: var(--radius-sm);
+		background: var(--bg-card);
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: color var(--transition-fast), border-color var(--transition-fast);
+	}
+
+	.copy-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+
+	/* Form fields */
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+	}
+
+	label {
+		font-size: var(--text-small);
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	.field-error {
+		font-size: var(--text-micro);
+		color: var(--color-copperwood);
+		max-width: none;
+	}
+
+	/* Receipt upload */
+	.upload-label {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-sm);
+		height: 56px;
+		border: 2px dashed var(--border-color);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-small);
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: border-color var(--transition-fast), color var(--transition-fast);
+	}
+
+	.upload-label:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+	.upload-label.uploading { opacity: 0.6; cursor: not-allowed; }
+
+	.receipt-preview-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+	}
+
+	.receipt-preview {
+		width: 100%;
+		max-height: 160px;
+		object-fit: contain;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--border-color);
+		background: var(--bg-page);
+	}
+
+	.btn-link {
+		font-size: var(--text-micro);
+		color: var(--text-secondary);
+		background: none;
+		border: none;
+		cursor: pointer;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		padding: 0;
+		align-self: flex-start;
+	}
+
+	@keyframes spin { to { transform: rotate(360deg); } }
+
+	.upload-spinner {
+		width: 18px;
+		height: 18px;
+		border: 2px solid var(--border-color);
+		border-top-color: var(--text-primary);
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+		flex-shrink: 0;
+	}
+
+	/* Alerts */
+	.alert-error {
+		background: rgba(188, 108, 37, 0.10);
+		color: var(--color-copperwood);
+		border: 1px solid rgba(188, 108, 37, 0.30);
+		border-radius: var(--radius-sm);
+		padding: var(--space-sm) var(--space-md);
+		font-size: var(--text-small);
+		max-width: none;
+	}
+
+	/* Checkout button */
 	.checkout-btn {
 		width: 100%;
 		gap: var(--space-sm);
 	}
 
-	.checkout-note {
+	.checkout-btn:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	.proceed-hint {
 		font-size: var(--text-micro);
 		color: var(--text-secondary);
 		text-align: center;
 		max-width: none;
+	}
+
+	.continue-btn {
+		width: 100%;
+		text-align: center;
 	}
 </style>

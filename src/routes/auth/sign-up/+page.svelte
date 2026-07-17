@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
 
-	let { form }: { form: ActionData } = $props();
+	let { data, form }: { data: { next: string }; form: ActionData } = $props();
 
 	let showPw = $state(false);
 	let loading = $state(false);
@@ -19,7 +19,7 @@
 	{#if form?.success}
 		<div class="alert-success" role="status">
 			<p>Account created! Check <strong>{form.email}</strong> for a confirmation link, then sign in.</p>
-			<a href="/auth/sign-in" class="btn btn-primary" style="margin-top: var(--space-md)">Go to sign in</a>
+			<a href="/auth/sign-in?next={encodeURIComponent(form.next ?? data.next)}" class="btn btn-primary" style="margin-top: var(--space-md)">Go to sign in</a>
 		</div>
 	{:else}
 		{#if form?.error}
@@ -35,6 +35,7 @@
 				return async ({ update }) => { loading = false; await update(); };
 			}}
 		>
+			<input type="hidden" name="next" value={data.next} />
 			<div class="field">
 				<label for="name">Full name</label>
 				<input
@@ -88,7 +89,7 @@
 		</form>
 
 		<p class="switch-msg">
-			Already have an account? <a href="/auth/sign-in">Sign in</a>
+			Already have an account? <a href="/auth/sign-in?next={encodeURIComponent(data.next)}">Sign in</a>
 		</p>
 	{/if}
 </div>

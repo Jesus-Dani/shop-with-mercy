@@ -1,9 +1,11 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.safeGetSession();
-	if (session) throw redirect(303, '/account');
+	const next = url.searchParams.get('next') ?? '/account';
+	if (session) throw redirect(303, next.startsWith('/') ? next : '/account');
+	return { next };
 };
 
 export const actions: Actions = {
@@ -12,6 +14,8 @@ export const actions: Actions = {
 		const name = String(form.get('name') ?? '').trim();
 		const email = String(form.get('email') ?? '').trim().toLowerCase();
 		const password = String(form.get('password') ?? '');
+		const next = String(form.get('next') ?? '/account');
+		const safeNext = next.startsWith('/') ? next : '/account';
 
 		if (!name || !email || !password) {
 			return fail(400, { error: 'All fields are required.', name, email });
@@ -25,7 +29,7 @@ export const actions: Actions = {
 			password,
 			options: {
 				data: { full_name: name },
-				emailRedirectTo: `${url.origin}/auth/callback`
+				emailRedirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`
 			}
 		});
 
@@ -45,10 +49,10 @@ export const actions: Actions = {
 		}
 
 		// If email confirmation disabled in Supabase → session exists immediately
-		if (data.session) throw redirect(303, '/account');
+		if (data.session) throw redirect(303, safeNext);
 
 		// Confirmation email sent
-		return { success: true, email };
+		return { success: true, email, next: safeNext };
 	},
 
 };

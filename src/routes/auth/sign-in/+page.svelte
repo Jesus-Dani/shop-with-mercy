@@ -76,7 +76,7 @@
 	</form>
 
 	<p class="switch-msg">
-		Don't have an account? <a href="/auth/sign-up">Create one</a>
+		Don't have an account? <a href="/auth/sign-up?next={encodeURIComponent(data.next)}">Create one</a>
 	</p>
 </div>
 

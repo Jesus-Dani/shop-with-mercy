@@ -20,6 +20,7 @@
 	let submitting = $state(false);
 	let orderError = $state<string | null>(null);
 	let copied = $state(false);
+	let successOrder = $state<{ orderNumber: string; whatsappUrl: string } | null>(null);
 
 	const canProceed = $derived(
 		!!data.user &&
@@ -100,10 +101,10 @@
 				`Hi! My name is ${data.user!.full_name}. I just placed an order:\n\n${itemsList}\n\nTotal: ${formatNaira(verifiedTotal)}\nPayment ref: ${paymentRef.trim()}\nPhone: ${phone.trim()}\nReceipt: ${receiptUrl}\nOrder: ${result.orderNumber}`
 			);
 
+			const whatsappUrl = `https://wa.me/${WHATSAPP}?text=${msg}`;
+			successOrder = { orderNumber: result.orderNumber, whatsappUrl };
 			cart.clear();
 			track('order_placed', { meta: { total: verifiedTotal, item_count: snapshot.length } });
-
-			window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank', 'noopener,noreferrer');
 		} catch (err) {
 			orderError = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
 			submitting = false;
@@ -118,7 +119,27 @@
 <div class="page-container cart-page">
 	<h1 class="page-title">Your Cart</h1>
 
-	{#if cart.items.length === 0}
+	{#if successOrder}
+		<div class="order-success">
+			<div class="success-icon" aria-hidden="true">✓</div>
+			<h2 class="success-heading">Order placed!</h2>
+			<p class="success-sub">Order <strong>#{successOrder.orderNumber}</strong> is confirmed and pending payment review.</p>
+			<p class="success-sub">Tap the button below to open WhatsApp and send your details to us.</p>
+			<a
+				href={successOrder.whatsappUrl}
+				class="btn btn-primary whatsapp-btn"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+					<path d="M11 12l1 1l2 -2" />
+				</svg>
+				Open WhatsApp to confirm →
+			</a>
+			<a href="/account" class="btn btn-outline">View my orders</a>
+		</div>
+	{:else if cart.items.length === 0}
 		<div class="empty-state">
 			<p>Your cart is empty.</p>
 			<a href="/shop" class="btn btn-primary">Browse the Collection</a>
@@ -340,6 +361,42 @@
 	.page-title {
 		font-size: var(--text-h1);
 		margin-bottom: var(--space-xl);
+	}
+
+	.order-success {
+		padding: var(--space-2xl) 0;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-md);
+		max-width: 480px;
+	}
+
+	.success-icon {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: #22c55e;
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.4rem;
+		font-weight: 700;
+	}
+
+	.success-heading {
+		font-size: var(--text-h2);
+		margin: 0;
+	}
+
+	.success-sub {
+		color: var(--text-secondary);
+		margin: 0;
+	}
+
+	.whatsapp-btn {
+		margin-top: var(--space-sm);
 	}
 
 	.empty-state {

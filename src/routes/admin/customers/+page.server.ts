@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 		const c = customerMap.get(key)!;
 		c.orderCount++;
-		if (['paid', 'fulfilled', 'delivered'].includes(o.status)) {
+		if (['pending', 'paid', 'fulfilled', 'delivered'].includes(o.status)) {
 			c.ltv += o.subtotal as number;
 		}
 		if (o.user_id && !c.user_id) {

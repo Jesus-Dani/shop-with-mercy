@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-const PAID_STATUSES = ['paid', 'fulfilled', 'delivered'];
+const PAID_STATUSES = ['pending', 'paid', 'fulfilled', 'delivered'];
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const email = decodeURIComponent(params.email);

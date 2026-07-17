@@ -35,7 +35,7 @@ function buildTimeSeries(
 			.sort((a, b) => a[0].localeCompare(b[0]))
 			.map(([key, kobo]) => ({
 				label: new Date(key + '-01').toLocaleDateString('en-NG', { month: 'short', year: 'numeric' }),
-				revenue: Math.round(kobo / 100)
+				revenue: Math.round(kobo)
 			}));
 	}
 
@@ -48,7 +48,7 @@ function buildTimeSeries(
 			const key = d.toISOString().slice(0, 13).replace('T', ' ') + ':00';
 			result.push({
 				label: `${String(h).padStart(2, '0')}:00`,
-				revenue: Math.round((map.get(key) ?? 0) / 100)
+				revenue: Math.round(map.get(key) ?? 0)
 			});
 		}
 		return result;
@@ -64,7 +64,7 @@ function buildTimeSeries(
 		const key = cur.toISOString().slice(0, 10);
 		result.push({
 			label: cur.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' }),
-			revenue: Math.round((map.get(key) ?? 0) / 100)
+			revenue: Math.round(map.get(key) ?? 0)
 		});
 		cur.setDate(cur.getDate() + 1);
 	}
@@ -151,7 +151,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const bestByRevenue = [...revItemMap.entries()]
 		.sort((a, b) => b[1] - a[1])
 		.slice(0, 8)
-		.map(([name, revenue]) => ({ name, revenue: Math.round(revenue / 100) }));
+		.map(([name, revenue]) => ({ name, revenue: Math.round(revenue) }));
 
 	// ── Order status breakdown ────────────────────────────────────────────────
 	const statusMap = new Map<string, number>();
@@ -171,7 +171,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 	const revenueByCategory = [...catMap.entries()]
 		.sort((a, b) => b[1] - a[1])
-		.map(([name, kobo]) => ({ name, revenue: Math.round(kobo / 100) }));
+		.map(([name, kobo]) => ({ name, revenue: Math.round(kobo) }));
 
 	// ── Low-stock alerts ──────────────────────────────────────────────────────
 	const lowStock = lowStockRows.map((v: any) => ({

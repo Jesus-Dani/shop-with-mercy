@@ -12,8 +12,8 @@
 		delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded'
 	};
 
-	function formatNaira(kobo: number) {
-		return '₦' + (kobo / 100).toLocaleString('en-NG', { maximumFractionDigits: 0 });
+	function formatNaira(naira: number) {
+		return '₦' + Math.round(naira).toLocaleString('en-NG');
 	}
 
 	function formatDate(iso: string) {

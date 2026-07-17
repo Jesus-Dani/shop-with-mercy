@@ -66,7 +66,7 @@
 	</div>
 
 	<div class="form-section">
-		<h2 class="section-title">Pricing <span class="hint">(enter in Naira — stored as kobo internally)</span></h2>
+		<h2 class="section-title">Pricing <span class="hint">(enter in Naira)</span></h2>
 
 		<div class="price-row">
 			<div class="field">

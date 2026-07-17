@@ -22,8 +22,8 @@
 
 	const PALETTE = ['#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444','#06b6d4','#f97316','#84cc16'];
 
-	function fmt(kobo: number) {
-		return '₦' + (kobo / 100).toLocaleString('en-NG', { maximumFractionDigits: 0 });
+	function fmt(naira: number) {
+		return '₦' + Math.round(naira).toLocaleString('en-NG');
 	}
 
 	function makeHBar(canvas: HTMLCanvasElement, Chart: any, labels: string[], values: number[], palette: string | string[], labelStr: string, tickFmt?: (v: any) => string) {

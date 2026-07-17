@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { formatNaira } from '$lib/format';
 
 	let { data }: { data: PageData } = $props();
 
@@ -7,6 +8,19 @@
 
 	const tabs = ['Orders', 'Wishlist', 'Profile'] as const;
 	let activeTab = $state<(typeof tabs)[number]>('Orders');
+
+	const STATUS_LABEL: Record<string, string> = {
+		pending: 'Pending',
+		paid: 'Paid',
+		fulfilled: 'Fulfilled',
+		delivered: 'Delivered',
+		cancelled: 'Cancelled',
+		refunded: 'Refunded'
+	};
+
+	function formatDate(iso: string) {
+		return new Date(iso).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
+	}
 </script>
 
 <svelte:head>
@@ -40,17 +54,50 @@
 	<!-- Tab panels -->
 	<div class="tab-panel">
 		{#if activeTab === 'Orders'}
-			<div class="coming-soon">
-				<p class="coming-label">Orders</p>
-				<p class="coming-sub">Your order history will appear here once you've made a purchase.</p>
-				<a href="/shop" class="btn btn-primary">Browse the Collection</a>
-			</div>
+			{#if data.orders.length === 0}
+				<div class="empty-panel">
+					<p class="empty-title">No orders yet</p>
+					<p class="empty-sub">Your order history will appear here after you place an order.</p>
+					<a href="/shop" class="btn btn-primary">Browse the Collection</a>
+				</div>
+			{:else}
+				<ul class="order-list" role="list">
+					{#each data.orders as order (order.id)}
+						<li class="order-card">
+							<div class="order-head">
+								<div class="order-meta">
+									<span class="order-num">Order {order.orderNumber}</span>
+									<span class="order-date">{formatDate(order.createdAt)}</span>
+								</div>
+								<span class="status-badge status-{order.status}">
+									{STATUS_LABEL[order.status] ?? order.status}
+								</span>
+							</div>
+
+							<ul class="order-items" role="list">
+								{#each order.items as item}
+									<li class="order-item">
+										<span class="item-name">{item.product_name}</span>
+										<span class="item-detail">{item.colour_name} · Size {item.size} · ×{item.quantity}</span>
+										<span class="item-price">{formatNaira(item.unit_price * item.quantity)}</span>
+									</li>
+								{/each}
+							</ul>
+
+							<div class="order-foot">
+								<span class="order-total-label">Total</span>
+								<span class="order-total">{formatNaira(order.subtotal)}</span>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 
 		{:else if activeTab === 'Wishlist'}
-			<div class="coming-soon">
-				<p class="coming-label">Wishlist</p>
-				<p class="coming-sub">Save items you love and come back to them any time.</p>
-				<a href="/shop" class="btn btn-outline">Start Shopping</a>
+			<div class="empty-panel">
+				<p class="empty-title">Your Wishlist</p>
+				<p class="empty-sub">View and manage items you've saved.</p>
+				<a href="/account/wishlist" class="btn btn-primary">Go to Wishlist</a>
 			</div>
 
 		{:else if activeTab === 'Profile'}
@@ -132,8 +179,8 @@
 		border-bottom-color: var(--color-cornsilk);
 	}
 
-	/* Coming soon panels */
-	.coming-soon {
+	/* Empty panels */
+	.empty-panel {
 		padding: var(--space-2xl) 0;
 		display: flex;
 		flex-direction: column;
@@ -141,15 +188,130 @@
 		gap: var(--space-md);
 	}
 
-	.coming-label {
+	.empty-title {
 		font-size: var(--text-h2);
 		font-weight: 600;
 		color: var(--text-primary);
 		max-width: none;
 	}
 
-	.coming-sub {
+	.empty-sub { color: var(--text-secondary); }
+
+	/* Order list */
+	.order-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-lg);
+	}
+
+	.order-card {
+		background: var(--bg-card);
+		border: 1px solid var(--border-color);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+	}
+
+	.order-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-md);
+		padding: var(--space-md) var(--space-lg);
+		border-bottom: 1px solid var(--border-color);
+		flex-wrap: wrap;
+	}
+
+	.order-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.order-num {
+		font-size: var(--text-small);
+		font-weight: 600;
+		color: var(--text-primary);
+	}
+
+	.order-date {
+		font-size: var(--text-micro);
 		color: var(--text-secondary);
+	}
+
+	/* Status badges */
+	.status-badge {
+		font-size: var(--text-micro);
+		font-weight: 600;
+		padding: 4px 10px;
+		border-radius: 100px;
+		text-transform: capitalize;
+	}
+
+	.status-pending  { background: rgba(188,108,37,0.12); color: var(--color-copperwood); }
+	.status-paid     { background: rgba(96,108,56,0.12);  color: var(--color-olive-leaf); }
+	.status-fulfilled{ background: rgba(96,108,56,0.12);  color: var(--color-olive-leaf); }
+	.status-delivered{ background: rgba(96,108,56,0.18);  color: var(--color-olive-leaf); }
+	.status-cancelled{ background: rgba(120,120,120,0.12);color: var(--text-secondary); }
+	.status-refunded { background: rgba(188,108,37,0.12); color: var(--color-copperwood); }
+
+	/* Order items */
+	.order-items {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		padding: var(--space-sm) var(--space-lg);
+	}
+
+	.order-item {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-sm);
+		padding-block: var(--space-sm);
+		border-bottom: 1px solid var(--border-color);
+		flex-wrap: wrap;
+	}
+
+	.order-item:last-child { border-bottom: none; }
+
+	.item-name {
+		font-size: var(--text-small);
+		font-weight: 500;
+		color: var(--text-primary);
+		flex: 1;
+		min-width: 120px;
+	}
+
+	.item-detail {
+		font-size: var(--text-micro);
+		color: var(--text-secondary);
+	}
+
+	.item-price {
+		font-size: var(--text-small);
+		font-weight: 600;
+		color: var(--text-primary);
+		margin-left: auto;
+	}
+
+	.order-foot {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: var(--space-md) var(--space-lg);
+		border-top: 1px solid var(--border-color);
+		background: var(--bg-page);
+	}
+
+	.order-total-label {
+		font-size: var(--text-small);
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	.order-total {
+		font-size: var(--text-body);
+		font-weight: 700;
+		color: var(--text-primary);
 	}
 
 	/* Profile */

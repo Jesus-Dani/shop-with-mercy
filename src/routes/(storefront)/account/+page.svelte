@@ -91,7 +91,11 @@
 											{/if}
 										</div>
 										<div class="item-info">
-											<span class="item-name">{item.product_name}</span>
+											{#if item.productId}
+												<a href="/shop/{item.productId}" class="item-name item-name-link">{item.product_name}</a>
+											{:else}
+												<span class="item-name">{item.product_name}</span>
+											{/if}
 											<span class="item-detail">{item.colour_name} · Size {item.size} · ×{item.quantity}</span>
 										</div>
 										<span class="item-price">{formatNaira(item.unit_price * item.quantity)}</span>
@@ -325,6 +329,11 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.item-name-link {
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 
 	.item-detail {

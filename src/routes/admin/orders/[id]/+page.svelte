@@ -110,8 +110,15 @@
 					</thead>
 					<tbody>
 						{#each o.order_items as item (item.id)}
+							{@const productId = item.product_variants?.product_colours?.product_id ?? null}
 							<tr>
-								<td>{item.product_name}</td>
+								<td>
+									{#if productId}
+										<a href="/admin/products/{productId}" class="product-link">{item.product_name}</a>
+									{:else}
+										{item.product_name}
+									{/if}
+								</td>
 								<td>{item.colour_name}</td>
 								<td>{item.size}</td>
 								<td>{item.quantity}</td>
@@ -282,6 +289,14 @@
 		border-top: 2px solid var(--border-color);
 		padding-top: var(--space-md);
 	}
+
+	.product-link {
+		color: var(--text-primary);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
+	.product-link:hover { color: var(--color-copperwood); }
 
 	.fw { font-weight: 600; }
 	.subtotal-label { text-align: right; color: var(--text-secondary); font-size: var(--text-small); }

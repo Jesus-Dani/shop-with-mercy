@@ -14,7 +14,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const { data: order, error: err } = await locals.supabaseAdmin
 		.from('orders')
-		.select('*, order_items(*)')
+		.select('*, order_items(*, product_variants(product_colours(product_id)))')
 		.eq('id', params.id)
 		.single();
 

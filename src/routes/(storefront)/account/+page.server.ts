@@ -19,7 +19,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			status,
 			subtotal,
 			created_at,
-			order_items ( product_name, colour_name, size, quantity, unit_price )
+			order_items (
+				product_name, colour_name, size, quantity, unit_price,
+				product_variants ( product_colours ( product_id ) )
+			)
 		`)
 		.eq('user_id', session.user.id)
 		.order('created_at', { ascending: false })
@@ -39,7 +42,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			size: item.size as string,
 			quantity: item.quantity as number,
 			unit_price: item.unit_price as number,
-			imagePublicId: null as string | null
+			imagePublicId: null as string | null,
+			productId: (item.product_variants?.product_colours?.product_id ?? null) as string | null
 		}))
 	}));
 

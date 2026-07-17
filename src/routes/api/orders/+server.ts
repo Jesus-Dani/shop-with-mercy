@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const customerName = (meta.full_name ?? meta.name ?? session.user.email ?? '') as string;
 	const customerEmail = session.user.email ?? '';
 
-	const { data: order, error: orderErr } = await locals.supabase
+	const { data: order, error: orderErr } = await locals.supabaseAdmin
 		.from('orders')
 		.insert({
 			user_id: session.user.id,
@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		cost_price: null
 	}));
 
-	const { error: itemsErr } = await locals.supabase.from('order_items').insert(orderItems);
+	const { error: itemsErr } = await locals.supabaseAdmin.from('order_items').insert(orderItems);
 	if (itemsErr) console.error('order_items insert failed:', itemsErr.message);
 
 	return json({ orderId: order.id, orderNumber: order.order_number });

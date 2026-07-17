@@ -81,8 +81,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			let q = locals.supabaseAdmin
 				.from('orders')
 				.select('id, subtotal, created_at')
-				.neq('status', 'cancelled')
-				.neq('status', 'refunded');
+				.in('status', ['paid', 'fulfilled', 'delivered']);
 			if (from) q = q.gte('created_at', from);
 			return q;
 		})(),

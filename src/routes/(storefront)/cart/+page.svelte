@@ -81,8 +81,11 @@
 					phone: phone.trim()
 				})
 			});
-			const json = await res.json();
-			if (!res.ok) throw new Error(json.message ?? 'Could not place order');
+			const result = await res.json();
+			if (!res.ok) throw new Error(result.message ?? 'Could not place order');
+
+			// Use server-verified subtotal (may differ if prices changed since cart was loaded)
+			const verifiedTotal = result.subtotal ?? total;
 
 			const itemsList = snapshot
 				.map(
@@ -94,11 +97,11 @@
 			const receiptUrl = `https://res.cloudinary.com/${env.PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${receiptPublicId}`;
 
 			const msg = encodeURIComponent(
-				`Hi! My name is ${data.user!.full_name}. I just placed an order:\n\n${itemsList}\n\nTotal: ${formatNaira(total)}\nPayment ref: ${paymentRef.trim()}\nPhone: ${phone.trim()}\nReceipt: ${receiptUrl}\nOrder: ${json.orderNumber}`
+				`Hi! My name is ${data.user!.full_name}. I just placed an order:\n\n${itemsList}\n\nTotal: ${formatNaira(verifiedTotal)}\nPayment ref: ${paymentRef.trim()}\nPhone: ${phone.trim()}\nReceipt: ${receiptUrl}\nOrder: ${result.orderNumber}`
 			);
 
 			cart.clear();
-			track('order_placed', { meta: { total, item_count: snapshot.length } });
+			track('order_placed', { meta: { total: verifiedTotal, item_count: snapshot.length } });
 
 			window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank', 'noopener,noreferrer');
 		} catch (err) {

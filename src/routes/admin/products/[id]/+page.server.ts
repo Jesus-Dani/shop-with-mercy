@@ -164,9 +164,19 @@ export const actions: Actions = {
 		return { action: 'addImage', success: true };
 	},
 
-	deleteImage: async ({ request, locals }) => {
+	deleteImage: async ({ request, locals, params }) => {
 		const form = await request.formData();
 		const imageId = String(form.get('image_id') ?? '');
+
+		// Verify the image belongs to a colour on this product before deleting
+		const { data: img } = await locals.supabaseAdmin
+			.from('product_images')
+			.select('id, product_colours ( product_id )')
+			.eq('id', imageId)
+			.maybeSingle();
+
+		if (!img || (img as any).product_colours?.product_id !== params.id)
+			return fail(403, { action: 'deleteImage', error: 'Image not found on this product.' });
 
 		const { error: err } = await locals.supabaseAdmin
 			.from('product_images')

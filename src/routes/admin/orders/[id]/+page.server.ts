@@ -12,7 +12,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 };
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const { data: order, error: err } = await locals.supabase
+	const { data: order, error: err } = await locals.supabaseAdmin
 		.from('orders')
 		.select('*, order_items(*)')
 		.eq('id', params.id)
@@ -31,7 +31,7 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const newStatus = String(form.get('status') ?? '');
 
-		const { data: order, error: fetchErr } = await locals.supabase
+		const { data: order, error: fetchErr } = await locals.supabaseAdmin
 			.from('orders')
 			.select('status')
 			.eq('id', params.id)
@@ -44,7 +44,7 @@ export const actions: Actions = {
 			return fail(400, { error: `Cannot move from "${order.status}" to "${newStatus}".` });
 		}
 
-		const { error: updateErr } = await locals.supabase
+		const { error: updateErr } = await locals.supabaseAdmin
 			.from('orders')
 			.update({ status: newStatus as any, updated_at: new Date().toISOString() })
 			.eq('id', params.id);

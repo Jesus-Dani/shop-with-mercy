@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// LTV and stats
 	const paidOrders = (orders as any[]).filter((o: any) => PAID_STATUSES.includes(o.status));
-	const ltv = paidOrders.reduce((s: number, o: any) => s + (o.subtotal as number), 0);
+	const ltv = paidOrders.reduce((s: number, o: any) => s + Number(o.subtotal), 0);
 	const avgOrder = paidOrders.length > 0 ? Math.round(ltv / paidOrders.length) : 0;
 
 	// Profile (only for registered customers)

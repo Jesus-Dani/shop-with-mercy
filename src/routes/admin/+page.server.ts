@@ -122,7 +122,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	// ── Stat cards ──────────────────────────────────────────────────────────
-	const totalRevenue = paidOrders.reduce((s: number, o: any) => s + o.subtotal, 0);
+	const totalRevenue = paidOrders.reduce((s: number, o: any) => s + Number(o.subtotal), 0);
 	const orderCount = paidOrders.length;
 	const aov = orderCount > 0 ? Math.round(totalRevenue / orderCount) : 0;
 
@@ -130,7 +130,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const revenueMap = new Map<TimeKey, number>();
 	for (const o of paidOrders) {
 		const key = timeKey(o.created_at, range);
-		revenueMap.set(key, (revenueMap.get(key) ?? 0) + o.subtotal);
+		revenueMap.set(key, (revenueMap.get(key) ?? 0) + Number(o.subtotal));
 	}
 	const revenueByTime = buildTimeSeries(range, from, revenueMap);
 
@@ -138,10 +138,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const unitMap = new Map<string, number>();
 	const revItemMap = new Map<string, number>();
 	for (const item of items) {
-		unitMap.set(item.product_name, (unitMap.get(item.product_name) ?? 0) + item.quantity);
+		unitMap.set(item.product_name, (unitMap.get(item.product_name) ?? 0) + Number(item.quantity));
 		revItemMap.set(
 			item.product_name,
-			(revItemMap.get(item.product_name) ?? 0) + item.unit_price * item.quantity
+			(revItemMap.get(item.product_name) ?? 0) + Number(item.unit_price) * Number(item.quantity)
 		);
 	}
 	const bestByUnits = [...unitMap.entries()]
@@ -167,7 +167,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	for (const item of items) {
 		const cat =
 			item.product_variants?.product_colours?.products?.categories?.name ?? 'Uncategorised';
-		catMap.set(cat, (catMap.get(cat) ?? 0) + item.unit_price * item.quantity);
+		catMap.set(cat, (catMap.get(cat) ?? 0) + Number(item.unit_price) * Number(item.quantity));
 	}
 	const revenueByCategory = [...catMap.entries()]
 		.sort((a, b) => b[1] - a[1])

@@ -101,7 +101,7 @@
 				`Hi! My name is ${data.user!.full_name}. I just placed an order:\n\n${itemsList}\n\nTotal: ${formatNaira(verifiedTotal)}\nPayment ref: ${paymentRef.trim()}\nPhone: ${phone.trim()}\nReceipt: ${receiptUrl}\nOrder: ${result.orderNumber}`
 			);
 
-			const whatsappUrl = `https://wa.me/${WHATSAPP}?text=${msg}`;
+			const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP}&text=${msg}`;
 			successOrder = { orderNumber: result.orderNumber, whatsappUrl };
 			cart.clear();
 			track('order_placed', { meta: { total: verifiedTotal, item_count: snapshot.length } });
@@ -128,8 +128,6 @@
 			<a
 				href={successOrder.whatsappUrl}
 				class="btn btn-primary whatsapp-btn"
-				target="_blank"
-				rel="noopener noreferrer"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 					<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { formatNaira } from '$lib/format';
+	import { cdnUrl } from '$lib/cloudinary';
 
 	let { data }: { data: PageData } = $props();
 
@@ -77,8 +78,22 @@
 							<ul class="order-items" role="list">
 								{#each order.items as item}
 									<li class="order-item">
-										<span class="item-name">{item.product_name}</span>
-										<span class="item-detail">{item.colour_name} · Size {item.size} · ×{item.quantity}</span>
+										<div class="item-thumb">
+											{#if item.imagePublicId}
+												<img
+													src={cdnUrl(item.imagePublicId, { width: 64, height: 80, crop: 'fill' })}
+													alt={item.product_name}
+													class="thumb-img"
+													loading="lazy"
+												/>
+											{:else}
+												<div class="thumb-placeholder" aria-hidden="true"></div>
+											{/if}
+										</div>
+										<div class="item-info">
+											<span class="item-name">{item.product_name}</span>
+											<span class="item-detail">{item.colour_name} · Size {item.size} · ×{item.quantity}</span>
+										</div>
 										<span class="item-price">{formatNaira(item.unit_price * item.quantity)}</span>
 									</li>
 								{/each}
@@ -264,21 +279,52 @@
 
 	.order-item {
 		display: flex;
-		align-items: baseline;
-		gap: var(--space-sm);
+		align-items: center;
+		gap: var(--space-md);
 		padding-block: var(--space-sm);
 		border-bottom: 1px solid var(--border-color);
-		flex-wrap: wrap;
 	}
 
 	.order-item:last-child { border-bottom: none; }
+
+	.item-thumb {
+		flex-shrink: 0;
+		width: 52px;
+		height: 65px;
+		border-radius: var(--radius-sm);
+		overflow: hidden;
+		background: var(--bg-page);
+	}
+
+	.thumb-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.thumb-placeholder {
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(135deg, var(--color-olive-leaf) 0%, var(--color-black-forest) 100%);
+		opacity: 0.2;
+	}
+
+	.item-info {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
 
 	.item-name {
 		font-size: var(--text-small);
 		font-weight: 500;
 		color: var(--text-primary);
-		flex: 1;
-		min-width: 120px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.item-detail {
@@ -287,10 +333,10 @@
 	}
 
 	.item-price {
+		flex-shrink: 0;
 		font-size: var(--text-small);
 		font-weight: 600;
 		color: var(--text-primary);
-		margin-left: auto;
 	}
 
 	.order-foot {

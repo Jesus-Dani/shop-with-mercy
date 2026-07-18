@@ -45,7 +45,7 @@
 	const canAddToCart = $derived(variant !== null && variant.stock_quantity > 0);
 	const totalStock = $derived(
 		data.colours.reduce(
-			(sum, c) => sum + c.variants.reduce((s, v) => s + v.stock_quantity, 0),
+			(sum, c) => sum + c.variants.reduce((s, v) => s + Number(v.stock_quantity), 0),
 			0
 		)
 	);

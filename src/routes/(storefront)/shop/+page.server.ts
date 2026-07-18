@@ -123,7 +123,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		const images = first ? [...first.product_images].sort((a, b) => a.sort_order - b.sort_order) : [];
 		const totalStock = p.product_colours
 			.flatMap((c) => c.product_variants)
-			.reduce((sum, v) => sum + v.stock_quantity, 0);
+			.reduce((sum, v) => sum + Number(v.stock_quantity), 0);
 
 		return {
 			id: p.id,

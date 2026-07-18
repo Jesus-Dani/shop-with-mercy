@@ -59,13 +59,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const variantIds = items.map((i: any) => i.variantId).filter(Boolean) as string[];
 	const priceMap = new Map<string, number>();
 
+	const stockMap = new Map<string, number>();
+
 	if (variantIds.length > 0) {
 		const { data: variants } = await locals.supabaseAdmin
 			.from('product_variants')
-			.select('id, product_colours ( products ( price, sale_price ) )')
+			.select('id, stock_quantity, product_colours ( products ( price, sale_price ) )')
 			.in('id', variantIds);
 
 		for (const v of (variants ?? []) as any[]) {
+			stockMap.set(v.id as string, Number(v.stock_quantity));
 			const product = v.product_colours?.products;
 			if (product) {
 				const effectivePrice =
@@ -74,6 +77,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						: product.price;
 				priceMap.set(v.id as string, effectivePrice as number);
 			}
+		}
+	}
+
+	// ── Stock availability check ──────────────────────────────────────────────
+	for (const i of items) {
+		if (!i.variantId) continue;
+		const available = stockMap.get(i.variantId);
+		if (available === undefined) continue; // variant deleted, allow through
+		if (available < i.quantity) {
+			return error(400, {
+				message: `Sorry, only ${available} left in stock for ${i.name} (Size ${i.size}). Please update your cart.`
+			});
 		}
 	}
 
@@ -128,6 +143,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (itemsErr) {
 		await locals.supabaseAdmin.from('orders').delete().eq('id', order.id);
 		return error(500, { message: 'Could not save order items. Please try again.' });
+	}
+
+	// ── Decrement stock ───────────────────────────────────────────────────────
+	for (const i of verifiedItems as any[]) {
+		if (!i.variantId) continue;
+		const current = stockMap.get(i.variantId);
+		if (current === undefined) continue;
+		await locals.supabaseAdmin
+			.from('product_variants')
+			.update({ stock_quantity: Math.max(0, current - i.quantity) })
+			.eq('id', i.variantId);
 	}
 
 	return json({

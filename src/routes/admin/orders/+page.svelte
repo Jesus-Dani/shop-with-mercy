@@ -65,16 +65,16 @@
 		<input type="hidden" name="status" value={data.status} />
 		<input type="hidden" name="q" value={data.q} />
 		<label class="date-label">
-			<span class="date-label-text">From</span>
+			<span>Start date</span>
 			<input type="date" name="from" value={data.from} class="date-input" />
 		</label>
 		<label class="date-label">
-			<span class="date-label-text">To</span>
+			<span>End date</span>
 			<input type="date" name="to" value={data.to} class="date-input" />
 		</label>
-		<button type="submit" class="btn btn-outline show-btn">Show</button>
+		<button type="submit" class="btn btn-outline show-btn">Show orders</button>
 		{#if data.from || data.to}
-			<a href="/admin/orders?status={data.status}" class="clear-link">Clear</a>
+			<a href="/admin/orders?status={data.status}" class="clear-link">Clear dates</a>
 		{/if}
 	</form>
 
@@ -204,15 +204,10 @@
 	.date-label {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
-	}
-
-	.date-label-text {
-		font-size: var(--text-micro);
+		gap: 6px;
+		font-size: var(--text-small);
 		font-weight: 600;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: var(--text-secondary);
+		color: var(--text-primary);
 	}
 
 	.date-input {

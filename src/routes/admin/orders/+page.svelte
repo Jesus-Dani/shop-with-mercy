@@ -60,31 +60,26 @@
 		<p class="alert-error" role="alert">{form.error}</p>
 	{/if}
 
-	<!-- Date range + search -->
-	<form method="GET" action="/admin/orders" class="filters-row">
+	<!-- Date filter -->
+	<form method="GET" action="/admin/orders" class="date-row">
 		<input type="hidden" name="status" value={data.status} />
+		<input type="hidden" name="q" value={data.q} />
+		<input type="date" name="from" value={data.from} class="date-input" aria-label="Start date" />
+		<span class="date-sep">→</span>
+		<input type="date" name="to" value={data.to} class="date-input" aria-label="End date" />
+		<button type="submit" class="btn btn-outline show-btn">Show</button>
+		{#if data.from || data.to}
+			<a href="/admin/orders?status={data.status}" class="clear-link">Clear</a>
+		{/if}
+	</form>
 
-		<div class="date-group">
-			<label class="field-label" for="from">Start date</label>
-			<input id="from" type="date" name="from" value={data.from} class="date-input" />
-		</div>
-
-		<div class="date-group">
-			<label class="field-label" for="to">End date</label>
-			<input id="to" type="date" name="to" value={data.to} class="date-input" />
-		</div>
-
-		<div class="date-group">
-			<label class="field-label" for="q">Search</label>
-			<input id="q" type="search" name="q" value={data.q} placeholder="Name, email or order #" class="search-input" />
-		</div>
-
-		<div class="filter-actions">
-			<button type="submit" class="btn btn-primary">Show orders</button>
-			{#if data.from || data.to || data.q}
-				<a href="/admin/orders?status={data.status}" class="clear-link">Clear</a>
-			{/if}
-		</div>
+	<!-- Search -->
+	<form method="GET" action="/admin/orders" class="search-bar">
+		<input type="hidden" name="status" value={data.status} />
+		<input type="hidden" name="from" value={data.from} />
+		<input type="hidden" name="to" value={data.to} />
+		<input type="search" name="q" value={data.q} placeholder="Search name, email or order #" class="search-input" />
+		<button type="submit" class="btn btn-outline">Search</button>
 	</form>
 
 	<!-- Status filter tabs -->
@@ -101,9 +96,13 @@
 	{#if data.orders.length === 0}
 		<p class="empty">No orders found.</p>
 	{:else}
-		<!-- Copy button — prominent, above the table -->
+		<!-- Copy button -->
 		<button type="button" class="copy-all-btn" onclick={copyOrders}>
-			{copyFeedback || `Copy all ${data.orders.length} orders to clipboard`}
+			{#if copyFeedback}
+				✓ Copied!
+			{:else}
+				Copy {data.orders.length} orders
+			{/if}
 		</button>
 
 		<div class="table-wrap">
@@ -190,39 +189,25 @@
 	.tab:hover { background: var(--bg-raised); color: var(--text-primary); }
 	.tab.active { background: var(--color-black-forest); color: var(--color-cornsilk); }
 
-	.filters-row {
-		display: flex;
-		align-items: flex-end;
-		gap: var(--space-md);
-		flex-wrap: wrap;
-	}
-
-	.date-group {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.field-label {
-		font-size: var(--text-micro);
-		font-weight: 600;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: var(--text-secondary);
-	}
-
-	.date-input {
-		width: 155px;
-	}
-
-	.search-input {
-		width: 220px;
-	}
-
-	.filter-actions {
+	.date-row {
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+		flex-wrap: wrap;
+	}
+
+	.date-input {
+		width: 145px;
+		flex-shrink: 0;
+	}
+
+	.date-sep {
+		color: var(--text-secondary);
+		font-size: var(--text-small);
+	}
+
+	.show-btn {
+		flex-shrink: 0;
 	}
 
 	.clear-link {
@@ -232,18 +217,32 @@
 		cursor: pointer;
 	}
 
+	.search-bar {
+		display: flex;
+		gap: var(--space-sm);
+	}
+
+	.search-input {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.copy-all-btn {
-		display: block;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-xs);
 		width: 100%;
-		padding: var(--space-sm) var(--space-md);
+		padding: 14px var(--space-md);
 		background: var(--color-black-forest);
 		color: var(--color-cornsilk);
-		border: none;
+		border: 2px solid var(--color-black-forest);
 		border-radius: var(--radius-sm);
 		font-size: var(--text-body);
-		font-weight: 600;
+		font-weight: 700;
 		cursor: pointer;
 		text-align: center;
+		letter-spacing: 0.01em;
 		transition: opacity var(--transition-fast);
 	}
 

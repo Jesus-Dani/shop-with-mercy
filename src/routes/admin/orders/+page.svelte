@@ -82,6 +82,15 @@
 		{#if fromVal || toVal}
 			<a href="/admin/orders?status={data.status}" class="clear-link">Clear dates</a>
 		{/if}
+		{#if data.orders.length > 0}
+			<button type="button" class="copy-icon-btn" onclick={copyOrders} title="Copy all orders to clipboard" aria-label="Copy all orders">
+				{#if copyFeedback}
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+				{:else}
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+				{/if}
+			</button>
+		{/if}
 	</form>
 
 	<!-- Search -->
@@ -107,15 +116,6 @@
 	{#if data.orders.length === 0}
 		<p class="empty">No orders found.</p>
 	{:else}
-		<!-- Copy button -->
-		<button type="button" class="copy-all-btn" onclick={copyOrders}>
-			{#if copyFeedback}
-				✓ Copied!
-			{:else}
-				Copy {data.orders.length} orders
-			{/if}
-		</button>
-
 		<div class="table-wrap">
 			<table class="orders-table">
 				<thead>
@@ -242,26 +242,27 @@
 		min-width: 0;
 	}
 
-	.copy-all-btn {
+	.copy-icon-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-xs);
-		width: 100%;
-		padding: 14px var(--space-md);
-		background: var(--color-black-forest);
-		color: var(--color-cornsilk);
-		border: 2px solid var(--color-black-forest);
+		width: 38px;
+		height: 38px;
+		padding: 0;
+		background: var(--bg-raised);
+		border: 1px solid var(--border-color);
 		border-radius: var(--radius-sm);
-		font-size: var(--text-body);
-		font-weight: 700;
+		color: var(--text-primary);
 		cursor: pointer;
-		text-align: center;
-		letter-spacing: 0.01em;
-		transition: opacity var(--transition-fast);
+		flex-shrink: 0;
+		transition: background var(--transition-fast), color var(--transition-fast);
 	}
 
-	.copy-all-btn:hover { opacity: 0.85; }
+	.copy-icon-btn:hover {
+		background: var(--color-black-forest);
+		color: var(--color-cornsilk);
+		border-color: var(--color-black-forest);
+	}
 
 	.empty {
 		color: var(--text-secondary);

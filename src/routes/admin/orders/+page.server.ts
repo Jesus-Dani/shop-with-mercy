@@ -14,19 +14,28 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const status = url.searchParams.get('status') ?? 'all';
 	const q = url.searchParams.get('q') ?? '';
+	const from = url.searchParams.get('from') ?? '';
+	const to = url.searchParams.get('to') ?? '';
+	const hasDateRange = !!(from && to);
+
+	const selectFields = hasDateRange
+		? 'id, order_number, customer_name, customer_email, customer_phone, status, subtotal, delivery_type, created_at, order_items(product_name, colour_name, size, quantity)'
+		: 'id, order_number, customer_name, customer_email, customer_phone, status, subtotal, delivery_type, created_at';
 
 	let query = locals.supabaseAdmin
 		.from('orders')
-		.select('id, order_number, customer_name, customer_email, status, subtotal, delivery_type, created_at')
+		.select(selectFields)
 		.order('created_at', { ascending: false });
 
 	if (status !== 'all') query = query.eq('status', status as any);
 	if (q) query = query.or(`order_number.ilike.%${q}%,customer_name.ilike.%${q}%,customer_email.ilike.%${q}%`);
+	if (from) query = query.gte('created_at', from);
+	if (to) query = query.lte('created_at', to + 'T23:59:59.999Z');
 
 	const { data: orders, error } = await query;
 	if (error) console.error('[admin/orders] load:', error.message);
 
-	return { orders: (orders ?? []) as any[], status, q };
+	return { orders: (orders ?? []) as any[], status, q, from, to };
 };
 
 export const actions: Actions = {

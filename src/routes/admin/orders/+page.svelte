@@ -30,37 +30,25 @@
 
 	let copyFeedback = $state('');
 
-	function buildCopyText() {
-		const header = [
-			`Orders: ${data.from} to ${data.to}`,
-			data.status !== 'all' ? `Status: ${STATUS_LABELS[data.status]}` : 'Status: All',
-			`Total: ${data.orders.length} order${data.orders.length !== 1 ? 's' : ''}`
-		].join(' | ');
-
-		const lines: string[] = [header, ''];
+	async function copyOrders() {
+		const lines: string[] = [];
 
 		for (const o of data.orders) {
-			lines.push(`#${o.order_number} · ${formatDate(o.created_at)} · ${(o.status as string).toUpperCase()} · ${formatNaira(Number(o.subtotal))}`);
+			lines.push(`Order #${o.order_number} — ${formatDate(o.created_at)}`);
 			lines.push(`${o.customer_name} | ${o.customer_phone ?? '—'}`);
+			lines.push(`Status: ${STATUS_LABELS[o.status] ?? o.status} | Total: ${formatNaira(Number(o.subtotal))}`);
 			if (Array.isArray(o.order_items) && o.order_items.length > 0) {
 				for (const item of o.order_items as any[]) {
-					lines.push(`  • ${item.product_name} · ${item.size} · ${item.colour_name} · x${item.quantity}`);
+					lines.push(`• ${item.product_name}, ${item.size}, ${item.colour_name} x${item.quantity}`);
 				}
 			}
 			lines.push('');
 		}
 
-		return lines.join('\n').trim();
-	}
-
-	async function copyOrders() {
-		const text = buildCopyText();
-		await navigator.clipboard.writeText(text);
+		await navigator.clipboard.writeText(lines.join('\n').trim());
 		copyFeedback = 'Copied!';
 		setTimeout(() => (copyFeedback = ''), 2000);
 	}
-
-	const canCopy = $derived(!!(data.from && data.to));
 </script>
 
 <svelte:head><title>Orders — SWM Admin</title></svelte:head>
@@ -69,6 +57,11 @@
 	<div class="page-header">
 		<h1 class="page-title">Orders</h1>
 		<span class="count">{data.orders.length} shown</span>
+		{#if data.orders.length > 0}
+			<button type="button" class="btn btn-outline copy-btn" onclick={copyOrders}>
+				{copyFeedback || 'Copy all'}
+			</button>
+		{/if}
 	</div>
 
 	{#if form?.error}
@@ -86,7 +79,7 @@
 		{/each}
 	</nav>
 
-	<!-- Search + Date range -->
+	<!-- Search -->
 	<form method="GET" action="/admin/orders" class="search-bar">
 		<input type="hidden" name="status" value={data.status} />
 		<input
@@ -96,23 +89,8 @@
 			placeholder="Search order number, name, email…"
 			class="search-input"
 		/>
-		<input type="date" name="from" value={data.from} class="date-input" title="From date" />
-		<input type="date" name="to" value={data.to} class="date-input" title="To date" />
-		<button type="submit" class="btn btn-outline">Filter</button>
-		{#if data.from || data.to}
-			<a href="/admin/orders?status={data.status}" class="btn btn-ghost clear-btn">Clear dates</a>
-		{/if}
+		<button type="submit" class="btn btn-outline">Search</button>
 	</form>
-
-	<!-- Copy bar — only shown when date range is active -->
-	{#if canCopy && data.orders.length > 0}
-		<div class="copy-bar">
-			<span class="copy-label">{data.orders.length} order{data.orders.length !== 1 ? 's' : ''} in range</span>
-			<button type="button" class="btn btn-outline copy-btn" onclick={copyOrders}>
-				{copyFeedback || 'Copy all orders'}
-			</button>
-		</div>
-	{/if}
 
 	{#if data.orders.length === 0}
 		<p class="empty">No orders found.</p>
@@ -215,40 +193,12 @@
 	.search-bar {
 		display: flex;
 		gap: var(--space-sm);
-		flex-wrap: wrap;
-		align-items: center;
+		max-width: 480px;
 	}
 
 	.search-input {
 		flex: 1;
-		min-width: 160px;
-	}
-
-	.date-input {
-		width: 140px;
-		flex-shrink: 0;
-	}
-
-	.clear-btn {
-		color: var(--text-secondary);
-		font-size: var(--text-small);
-		text-decoration: none;
-		padding: 6px 10px;
-	}
-
-	.copy-bar {
-		display: flex;
-		align-items: center;
-		gap: var(--space-md);
-		padding: var(--space-sm) var(--space-md);
-		background: var(--bg-raised);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--border-color);
-	}
-
-	.copy-label {
-		font-size: var(--text-small);
-		color: var(--text-secondary);
+		min-width: 0;
 	}
 
 	.copy-btn {

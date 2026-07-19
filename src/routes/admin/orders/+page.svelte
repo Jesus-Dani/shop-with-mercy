@@ -54,61 +54,58 @@
 <svelte:head><title>Orders — SWM Admin</title></svelte:head>
 
 <div class="page">
-	<div class="page-header">
-		<h1 class="page-title">Orders</h1>
-		<span class="count">{data.orders.length} shown</span>
-		{#if data.orders.length > 0}
-			<button type="button" class="btn btn-outline copy-btn" onclick={copyOrders}>
-				{copyFeedback || 'Copy all'}
-			</button>
-		{/if}
-	</div>
+	<h1 class="page-title">Orders</h1>
 
 	{#if form?.error}
 		<p class="alert-error" role="alert">{form.error}</p>
 	{/if}
 
+	<!-- Date range + search -->
+	<form method="GET" action="/admin/orders" class="filters-row">
+		<input type="hidden" name="status" value={data.status} />
+
+		<div class="date-group">
+			<label class="field-label" for="from">Start date</label>
+			<input id="from" type="date" name="from" value={data.from} class="date-input" />
+		</div>
+
+		<div class="date-group">
+			<label class="field-label" for="to">End date</label>
+			<input id="to" type="date" name="to" value={data.to} class="date-input" />
+		</div>
+
+		<div class="date-group">
+			<label class="field-label" for="q">Search</label>
+			<input id="q" type="search" name="q" value={data.q} placeholder="Name, email or order #" class="search-input" />
+		</div>
+
+		<div class="filter-actions">
+			<button type="submit" class="btn btn-primary">Show orders</button>
+			{#if data.from || data.to || data.q}
+				<a href="/admin/orders?status={data.status}" class="clear-link">Clear</a>
+			{/if}
+		</div>
+	</form>
+
 	<!-- Status filter tabs -->
 	<nav class="status-tabs" aria-label="Filter by status">
 		{#each STATUSES as s}
 			<a
-				href="/admin/orders?status={s}{data.q ? `&q=${encodeURIComponent(data.q)}` : ''}"
+				href="/admin/orders?status={s}{data.q ? `&q=${encodeURIComponent(data.q)}` : ''}{data.from ? `&from=${data.from}` : ''}{data.to ? `&to=${data.to}` : ''}"
 				class="tab"
 				class:active={data.status === s}
 			>{s === 'all' ? 'All' : STATUS_LABELS[s]}</a>
 		{/each}
 	</nav>
 
-	<!-- Date range filter -->
-	<form method="GET" action="/admin/orders" class="date-filter">
-		<input type="hidden" name="status" value={data.status} />
-		<input type="hidden" name="q" value={data.q} />
-		<label class="date-label">From <input type="date" name="from" value={data.from} class="date-input" /></label>
-		<label class="date-label">To <input type="date" name="to" value={data.to} class="date-input" /></label>
-		<button type="submit" class="btn btn-outline">Apply</button>
-		{#if data.from || data.to}
-			<a href="/admin/orders?status={data.status}&q={data.q}" class="clear-link">Clear dates</a>
-		{/if}
-	</form>
-
-	<!-- Search -->
-	<form method="GET" action="/admin/orders" class="search-bar">
-		<input type="hidden" name="status" value={data.status} />
-		<input type="hidden" name="from" value={data.from} />
-		<input type="hidden" name="to" value={data.to} />
-		<input
-			type="search"
-			name="q"
-			value={data.q}
-			placeholder="Search order number, name, email…"
-			class="search-input"
-		/>
-		<button type="submit" class="btn btn-outline">Search</button>
-	</form>
-
 	{#if data.orders.length === 0}
 		<p class="empty">No orders found.</p>
 	{:else}
+		<!-- Copy button — prominent, above the table -->
+		<button type="button" class="copy-all-btn" onclick={copyOrders}>
+			{copyFeedback || `Copy all ${data.orders.length} orders to clipboard`}
+		</button>
+
 		<div class="table-wrap">
 			<table class="orders-table">
 				<thead>
@@ -162,18 +159,7 @@
 <style>
 	.page { display: flex; flex-direction: column; gap: var(--space-lg); }
 
-	.page-header {
-		display: flex;
-		align-items: baseline;
-		gap: var(--space-md);
-	}
-
 	.page-title { font-size: var(--text-h1); }
-
-	.count {
-		font-size: var(--text-small);
-		color: var(--text-secondary);
-	}
 
 	.alert-error {
 		background: rgba(188, 108, 37, 0.10);
@@ -204,24 +190,39 @@
 	.tab:hover { background: var(--bg-raised); color: var(--text-primary); }
 	.tab.active { background: var(--color-black-forest); color: var(--color-cornsilk); }
 
-	.date-filter {
+	.filters-row {
 		display: flex;
-		align-items: center;
+		align-items: flex-end;
 		gap: var(--space-md);
 		flex-wrap: wrap;
 	}
 
-	.date-label {
+	.date-group {
 		display: flex;
-		align-items: center;
-		gap: var(--space-xs);
-		font-size: var(--text-small);
-		font-weight: 500;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.field-label {
+		font-size: var(--text-micro);
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
 		color: var(--text-secondary);
 	}
 
 	.date-input {
-		width: 150px;
+		width: 155px;
+	}
+
+	.search-input {
+		width: 220px;
+	}
+
+	.filter-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
 	}
 
 	.clear-link {
@@ -231,20 +232,22 @@
 		cursor: pointer;
 	}
 
-	.search-bar {
-		display: flex;
-		gap: var(--space-sm);
-		max-width: 480px;
+	.copy-all-btn {
+		display: block;
+		width: 100%;
+		padding: var(--space-sm) var(--space-md);
+		background: var(--color-black-forest);
+		color: var(--color-cornsilk);
+		border: none;
+		border-radius: var(--radius-sm);
+		font-size: var(--text-body);
+		font-weight: 600;
+		cursor: pointer;
+		text-align: center;
+		transition: opacity var(--transition-fast);
 	}
 
-	.search-input {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.copy-btn {
-		margin-left: auto;
-	}
+	.copy-all-btn:hover { opacity: 0.85; }
 
 	.empty {
 		color: var(--text-secondary);

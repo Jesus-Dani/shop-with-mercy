@@ -28,6 +28,12 @@
 		return new Date(iso).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
 	}
 
+	let fromVal = $state(data.from ?? '');
+	let toVal   = $state(data.to   ?? '');
+
+	$effect(() => { fromVal = data.from ?? ''; });
+	$effect(() => { toVal   = data.to   ?? ''; });
+
 	let copyFeedback = $state('');
 
 	async function copyOrders() {
@@ -66,14 +72,14 @@
 		<input type="hidden" name="q" value={data.q} />
 		<label class="date-label">
 			<span>Start date</span>
-			<input type="date" name="from" value={data.from} class="date-input" />
+			<input type="date" name="from" bind:value={fromVal} class="date-input" />
 		</label>
 		<label class="date-label">
 			<span>End date</span>
-			<input type="date" name="to" value={data.to} class="date-input" />
+			<input type="date" name="to" bind:value={toVal} class="date-input" />
 		</label>
 		<button type="submit" class="btn btn-outline show-btn">Show orders</button>
-		{#if data.from || data.to}
+		{#if fromVal || toVal}
 			<a href="/admin/orders?status={data.status}" class="clear-link">Clear dates</a>
 		{/if}
 	</form>

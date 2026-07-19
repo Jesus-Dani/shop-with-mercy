@@ -79,9 +79,23 @@
 		{/each}
 	</nav>
 
+	<!-- Date range filter -->
+	<form method="GET" action="/admin/orders" class="date-filter">
+		<input type="hidden" name="status" value={data.status} />
+		<input type="hidden" name="q" value={data.q} />
+		<label class="date-label">From <input type="date" name="from" value={data.from} class="date-input" /></label>
+		<label class="date-label">To <input type="date" name="to" value={data.to} class="date-input" /></label>
+		<button type="submit" class="btn btn-outline">Apply</button>
+		{#if data.from || data.to}
+			<a href="/admin/orders?status={data.status}&q={data.q}" class="clear-link">Clear dates</a>
+		{/if}
+	</form>
+
 	<!-- Search -->
 	<form method="GET" action="/admin/orders" class="search-bar">
 		<input type="hidden" name="status" value={data.status} />
+		<input type="hidden" name="from" value={data.from} />
+		<input type="hidden" name="to" value={data.to} />
 		<input
 			type="search"
 			name="q"
@@ -189,6 +203,33 @@
 
 	.tab:hover { background: var(--bg-raised); color: var(--text-primary); }
 	.tab.active { background: var(--color-black-forest); color: var(--color-cornsilk); }
+
+	.date-filter {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+		flex-wrap: wrap;
+	}
+
+	.date-label {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		font-size: var(--text-small);
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	.date-input {
+		width: 150px;
+	}
+
+	.clear-link {
+		font-size: var(--text-small);
+		color: var(--text-secondary);
+		text-decoration: underline;
+		cursor: pointer;
+	}
 
 	.search-bar {
 		display: flex;
